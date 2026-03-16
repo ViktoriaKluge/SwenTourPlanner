@@ -1,0 +1,17 @@
+<div class="card">
+  <div class="card-body">
+    <div class="fw-semibold mb-2">Results</div>
+
+    <div class="d-grid gap-2">
+      @for (to of tours(); track to.id) {
+        <app-tour-card
+          [tour]="to"
+          [active]="selectedId() === to.id"
+          (select)="onSelect($event)"
+        ></app-tour-card>
+      } @empty {
+        <div class="text-muted">No matching tours.</div>
+      }
+    </div>
+  </div>
+</div>

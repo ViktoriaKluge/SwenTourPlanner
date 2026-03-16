@@ -1,0 +1,11 @@
+
+
+.details {
+  max-width: 600px;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.details h2 {
+  margin-top: 0;
+}

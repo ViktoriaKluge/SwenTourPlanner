@@ -1,0 +1,17 @@
+<div class="card">
+  <h2 class="h6 mb-2">Category</h2>
+
+  <div class="list-group">
+    @for (c of categories; track c.id) {
+      <button
+        type="button"
+        class="btn-primary list-group-item"
+        [class.active]="selected() === c.id"
+        (click)="setCategory(c.id)"
+      >
+        {{ c.label }}
+      </button>
+    }
+  </div>
+
+</div>

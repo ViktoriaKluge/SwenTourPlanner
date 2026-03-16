@@ -1,0 +1,26 @@
+<button
+  type="button"
+  class="btn text-start border w-100"
+  [class.btn-primary]="active"
+  [class.btn-outline-primary]="!active"
+  (click)="choose()"
+>
+  <div class="d-flex justify-content-between align-items-center mb-1">
+    <div class="fw-semibold">{{ tour.title }}</div>
+
+
+    <span
+      class="badge"
+      [class.bg-primary]="tour.category === 'hike'"
+      [class.bg-success]="tour.category === 'run'"
+      [class.bg-warning]="tour.category === 'bike'"
+      class="text-dark"
+    >
+      {{ tour.category }}
+    </span>
+  </div>
+
+  <div class="small opacity-75">
+    Points: {{ tour.speed }}
+  </div>
+</button>

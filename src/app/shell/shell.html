@@ -1,0 +1,19 @@
+  <div>
+    <app-header></app-header>
+  </div> 
+  <div class="container-fluid">
+
+
+    @if (this.state.activeSession().sections.includes('home')) {
+     <app-home></app-home> 
+    }
+
+    @if (this.state.activeSession().sections.includes('about')) {
+      <app-about></app-about>
+    }
+
+    @if (this.state.activeSession().sections.includes('login')) {
+      <app-login></app-login>
+    }
+
+</div>

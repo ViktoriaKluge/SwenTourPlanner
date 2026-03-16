@@ -1,0 +1,24 @@
+<div class="content-container container-fluid">
+  <section class="home full-width">
+    <h2>{{ title() }}</h2>
+
+    @if (this.state.activeSession().loggedIn) {
+      <div class="row">
+
+        <div class="col-12 col-md-2 px-2">
+          <app-sidebar></app-sidebar>
+        </div>
+
+        <div class="col-12 col-md-5 px-1" >
+          <app-toolbar></app-toolbar>
+          <app-tour-list class="px-1"></app-tour-list>
+        </div>
+
+        <div class="col-12 col-md-5 px-2">
+          <app-details></app-details>
+        </div>
+      </div>
+    
+    }
+  </section>
+</div>

@@ -1,0 +1,19 @@
+<div class="details card">
+  <div class="card-body">
+    <h2 class="h2 mb-3 d-flex gap-2">Details</h2>
+
+    @if (selected()) {
+      <div class="mb-2 ">
+        <div class="h6 mb-1">{{ selected()!.title }}</div>
+        <div class="text-muted small mb-2">
+          Category: <b>{{ selected()!.category }}</b> • Points: <b>{{ selected()!.speed }}</b>
+        </div>
+        <div>{{ selected()!.description }}</div>
+      </div>
+
+      <button class="btn btn-primary" type="button" (click)="clear()">Clear</button>
+    } @else {
+      <div class="text-muted">Select a tour to see details.</div>
+    }
+  </div>
+</div>

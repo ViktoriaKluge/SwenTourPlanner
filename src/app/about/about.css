@@ -1,0 +1,11 @@
+
+
+.about {
+  max-width: 600px;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.about h2 {
+  margin-top: 0;
+}
