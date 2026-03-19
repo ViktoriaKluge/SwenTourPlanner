@@ -122,9 +122,22 @@ export class AppStateService {
 
   login(username: string): void {
     this.activeSession.set({loggedIn: true, username: username, sections:['home']})
+    console.log('Logged in:', this.activeSession());
   }
 
   logout(): void {
+    console.log('Logged out');
     this.activeSession.set({loggedIn: false, username: '', sections:['home']});
+  }
+
+  setActiveSection(section: Section) {
+    console.log('Set active section to '+section);
+  
+    const currentSession = this.activeSession();
+      this.activeSession.set({
+        loggedIn: currentSession.loggedIn,
+        username: currentSession.username,
+        sections: [section],
+    });
   }
 }

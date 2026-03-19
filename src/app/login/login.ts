@@ -1,7 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { AppStateService } from "../app-state";
 import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
-import { Router } from "@angular/router";
 
 @Component ({
     selector: 'app-login',
@@ -12,8 +11,7 @@ import { Router } from "@angular/router";
 })
 
 export class LoginComponent {
-    public state = inject(AppStateService);
-    private router = inject(Router)
+    private readonly state = inject(AppStateService);
     loginForm: FormGroup;
 
     constructor(private builder: FormBuilder) {
@@ -27,12 +25,7 @@ export class LoginComponent {
         console.log('Login wurde aufgerufen!');
         if (this.loginForm.valid) {
             let name = this.loginForm.get('username')?.value;
-            this.state.activeSession.set({
-                loggedIn: true,
-                username: name,
-                sections:['home']
-            });
-            console.log('Logged in:', this.state.activeSession());
+            this.state.login(name);
         }
     }
 }
