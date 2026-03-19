@@ -2,8 +2,8 @@
   <div class="logo">
     <span class="logo-mark clickable-text" (click)="goTo('home')">TP</span>
     <span class="logo-text clickable-text" (click)="goTo('home')">Tour Planner</span>
-    @if (this.state.activeSession().loggedIn) {
-      <span class="logo-username">Hello, {{ this.state.activeSession().username }}</span>
+    @if (this.session().loggedIn) {
+      <span class="logo-username">Hello, {{ this.session().username }}</span>
     }
   </div>
 
@@ -16,7 +16,7 @@
       About
     </span>
 
-    @if (!this.state.activeSession().loggedIn) {
+    @if (!this.session().loggedIn) {
       <span (click)="goTo('login')" class="clickable-text">
         Login
     </span>

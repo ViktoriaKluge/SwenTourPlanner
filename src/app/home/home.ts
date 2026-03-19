@@ -15,5 +15,6 @@ import { ToolbarComponent } from "../toolbar/toolbar";
 
 export class HomeComponent {
     protected readonly title = signal('TourPlanner')
-    readonly state = inject(AppStateService);
+    private readonly state = inject(AppStateService);
+    readonly session = this.state.activeSession;
 }

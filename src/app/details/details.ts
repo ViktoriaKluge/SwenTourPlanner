@@ -12,7 +12,7 @@ export class DetailsComponent {
     private readonly state = inject(AppStateService);
 
     readonly selected = this.state.selectedTour;
-
+ 
     clear(): void {
         this.state.clearSelection();
     }

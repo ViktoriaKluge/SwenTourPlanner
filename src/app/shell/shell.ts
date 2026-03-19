@@ -14,6 +14,6 @@ import { HomeComponent } from "../home/home";
 })
 
 export class ShellComponent {
-    readonly state = inject(AppStateService);
-
+    private readonly state = inject(AppStateService);
+    readonly session = this.state.activeSession;
 }

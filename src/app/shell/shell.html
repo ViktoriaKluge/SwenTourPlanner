@@ -4,15 +4,15 @@
   <div class="container-fluid">
 
 
-    @if (this.state.activeSession().sections.includes('home')) {
+    @if (this.session().sections.includes('home')) {
      <app-home></app-home> 
     }
 
-    @if (this.state.activeSession().sections.includes('about')) {
+    @if (this.session().sections.includes('about')) {
       <app-about></app-about>
     }
 
-    @if (this.state.activeSession().sections.includes('login')) {
+    @if (this.session().sections.includes('login')) {
       <app-login></app-login>
     }
 

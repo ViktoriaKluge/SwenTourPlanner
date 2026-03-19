@@ -45,7 +45,7 @@ export class AppStateService {
       title: 'Just like riding a bike',
       category: 'bike',
       speed: 10,
-      description: 'You can never unlearn this.',
+      description: 'You never forget how to do this.',
     },
   ]);
 
@@ -54,13 +54,13 @@ export class AppStateService {
     const q = this.searchText().trim().toLowerCase();
     const cat = this.selectedCategory();
 
-    return this.tours().filter((it) => {
-      const catOk = cat === 'all' ? true : it.category === cat;
+    return this.tours().filter((to) => {
+      const catOk = cat === 'all' ? true : to.category === cat;
       const qOk =
         q.length === 0
           ? true
-          : it.title.toLowerCase().includes(q) ||
-            it.description.toLowerCase().includes(q);
+          : to.title.toLowerCase().includes(q) ||
+            to.description.toLowerCase().includes(q);
       return catOk && qOk;
     });
   });
@@ -126,8 +126,8 @@ export class AppStateService {
   }
 
   logout(): void {
-    console.log('Logged out');
     this.activeSession.set({loggedIn: false, username: '', sections:['home']});
+    console.log('Logged out');
   }
 
   setActiveSection(section: Section) {

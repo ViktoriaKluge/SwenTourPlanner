@@ -10,7 +10,8 @@ import { AppStateService, Section } from "../app-state";
 })
 
 export class HeaderComponent {
-    readonly state = inject(AppStateService);
+    private readonly state = inject(AppStateService);
+    readonly session = this.state.activeSession;
 
     constructor() {
     console.log('✅ HeaderComponent geladen!');
