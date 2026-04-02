@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { AppStateService, Category } from '../app-state';
+import { AppStateService} from '../app-state';
+import { Category } from '../app-types';
 
 @Component({
   selector: 'app-sidebar',

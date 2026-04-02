@@ -4,6 +4,7 @@ import { DetailsComponent } from "../details/details";
 import { AppStateService } from "../app-state";
 import { TourListComponent } from "../tour-list/tour-list";
 import { ToolbarComponent } from "../toolbar/toolbar";
+import { TourFormComponent } from "../tour-form/tour-form";
 
 @Component({
     selector: 'app-home',

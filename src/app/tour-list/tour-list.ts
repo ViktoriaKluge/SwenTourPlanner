@@ -1,6 +1,7 @@
 import { Component, inject } from "@angular/core";
-import { AppStateService, Tour } from "../app-state";
+import { AppStateService} from "../app-state";
 import { TourCardComponent } from "../tour-card/tour-card";
+import { Tour } from "../app-types";
 
 @Component ({
     selector: 'app-tour-list',

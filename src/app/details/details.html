@@ -1,19 +1,53 @@
 <div class="details card">
   <div class="card-body">
-    <h2 class="h2 mb-3 d-flex gap-2">Details</h2>
 
-    @if (selected()) {
-      <div class="mb-2 ">
-        <div class="h6 mb-1">{{ selected()!.title }}</div>
-        <div class="text-muted small mb-2">
-          Category: <b>{{ selected()!.category }}</b> • Points: <b>{{ selected()!.speed }}</b>
-        </div>
-        <div>{{ selected()!.description }}</div>
+    @if (selected() && editing()) {
+      <app-tour-form [tour]="selected()" (cancelled)="editing.set(false)" />
+    } @else if (selected()) {
+      <h2 class="h2 mb-3">{{ selected()!.title }}</h2>
+
+      <div class="mb-3">
+        <span class="badge bg-secondary">{{ selected()!.category }}</span>
       </div>
 
-      <button class="btn btn-primary" type="button" (click)="clear()">Clear</button>
+      <div class="mb-3">
+        <div class="text-muted small">Description</div>
+        <div>{{ selected()!.description || '–' }}</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="text-muted small">Route</div>
+        <div>{{ selected()!.route.distance }} km &nbsp;·&nbsp; {{ selected()!.route.durationMin }} Min.</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="text-muted small">Start point</div>
+        <div>{{ selected()!.startPoint.name }} ({{ selected()!.startPoint.latitude }}, {{ selected()!.startPoint.longitude }})</div>
+      </div>
+
+      <div class="mb-3">
+        <div class="text-muted small">End point</div>
+        <div>{{ selected()!.endPoint.name }} ({{ selected()!.endPoint.latitude }}, {{ selected()!.endPoint.longitude }})</div>
+      </div>
+
+      @if (selected()!.poi.length > 0) {
+        <div class="mb-3">
+          <div class="text-muted small">Points of Interest</div>
+          @for (p of selected()!.poi; track p.name) {
+            <div>{{ p.name }} ({{ p.latitude }}, {{ p.longitude }})</div>
+          }
+        </div>
+      }
+
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-primary" type="button" (click)="edit()">Edit</button>
+        <button class="btn btn-danger" type="button" (click)="delete()">Delete</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="clear()">Close</button>
+      </div>
     } @else {
+      <h2 class="h2 mb-3">Details</h2>
       <div class="text-muted">Select a tour to see details.</div>
     }
+
   </div>
 </div>

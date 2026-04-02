@@ -1,0 +1,86 @@
+@if (showForm() || tour()) {
+ <div class="content-container">
+  <form class="tour-form" [formGroup]="tourForm" (ngSubmit)="submit()">
+    <h2>Tour</h2>
+
+    <div class="form-group">
+      <label for="title">Titel</label>
+      <input type="text" id="title" formControlName="title" placeholder="Tour name" />
+    </div>
+
+    <div class="form-group">
+      <label for="category">Category</label>
+      <select id="category" formControlName="category">
+        <option value="hike">Hike</option>
+        <option value="run">Run</option>
+        <option value="bike">Bike</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" formControlName="description" placeholder="Description of your tour" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="image">Bild-URL</label>
+      <input type="text" id="image" formControlName="image" placeholder="https://willBeAddedLater" />
+    </div>
+
+    <div class="section-label">Start Point</div>
+    <div formGroupName="startPoint" class="location-group">
+      <div class="form-group">
+        <label for="startName">Name</label>
+        <input type="text" id="startName" formControlName="name" placeholder="where you want to start" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startLat">Latitude</label>
+          <input type="number" id="startLat" formControlName="latitude" placeholder="48.2093" />
+        </div>
+        <div class="form-group">
+          <label for="startLon">Longitude</label>
+          <input type="number" id="startLon" formControlName="longitude" placeholder="16.3728" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">End Point</div>
+    <div formGroupName="endPoint" class="location-group">
+      <div class="form-group">
+        <label for="endName">Name</label>
+        <input type="text" id="endName" formControlName="name" placeholder="where you want to end" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="endLat">Latitude</label>
+          <input type="number" id="endLat" formControlName="latitude" placeholder="48.2093" />
+        </div>
+        <div class="form-group">
+          <label for="endLon">Longitude</label>
+          <input type="number" id="endLon" formControlName="longitude" placeholder="16.3728" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label">Route</div>
+    <div formGroupName="route" class="form-row">
+      <div class="form-group">
+        <label for="distance">Distance (km)</label>
+        <input type="number" id="distance" formControlName="distance" placeholder="12" min="0" />
+      </div>
+      <div class="form-group">
+        <label for="duration">Duration (Min.)</label>
+        <input type="number" id="duration" formControlName="durationMin" placeholder="90" min="0" />
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" (click)="cancel()">Cancel</button>
+      <button type="submit" class="submit-btn" [disabled]="tourForm.invalid">Save tour</button>
+    </div>
+  </form>
+</div> 
+}
+
+
