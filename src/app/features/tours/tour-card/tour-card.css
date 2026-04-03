@@ -1,0 +1,102 @@
+.tour-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.tour-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.12);
+}
+
+.tour-card.active {
+  border-color: #667eea;
+  background: #f5f7ff;
+  box-shadow: 0 2px 12px rgba(102, 126, 234, 0.18);
+}
+
+/* Category icon circle */
+.card-icon {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.card-icon.category-hike { background: #e6f4ea; }
+.card-icon.category-run  { background: #fff3cd; }
+.card-icon.category-bike { background: #dbeafe; }
+
+/* Body */
+.card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2d3748;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.card-tag {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.card-tag.category-hike { background: #e6f4ea; color: #276749; }
+.card-tag.category-run  { background: #fff3cd; color: #856404; }
+.card-tag.category-bike { background: #dbeafe; color: #1e40af; }
+
+.card-stat {
+  font-size: 0.78rem;
+  color: #718096;
+}
+
+.card-desc {
+  font-size: 0.82rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Arrow */
+.card-arrow {
+  flex-shrink: 0;
+  color: #cbd5e0;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.tour-card:hover .card-arrow,
+.tour-card.active .card-arrow {
+  color: #667eea;
+  transform: translateX(2px);
+}

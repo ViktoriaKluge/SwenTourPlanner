@@ -1,0 +1,76 @@
+@if (selected()) {
+  <div class="detail-card">
+
+    @if (editing()) {
+      <app-tour-form [tour]="selected()" (cancelled)="cancelEdit()" />
+    } @else {
+      <!-- Header -->
+      <div class="detail-header">
+        <div>
+          <h2 class="detail-title">{{ selected()!.title }}</h2>
+          <span class="category-badge category-{{ selected()!.category }}">
+            {{ selected()!.category }}
+          </span>
+        </div>
+        <button class="close-btn" type="button" (click)="close()" aria-label="Schließen">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Info rows -->
+      @if (selected()!.description) {
+        <div class="info-row">
+          <span class="info-label">Beschreibung</span>
+          <span class="info-value">{{ selected()!.description }}</span>
+        </div>
+      }
+
+      <div class="info-grid">
+        <div class="info-card">
+          <span class="info-icon">📏</span>
+          <span class="info-num">{{ selected()!.route.distance }}</span>
+          <span class="info-unit">km</span>
+        </div>
+        <div class="info-card">
+          <span class="info-icon">⏱</span>
+          <span class="info-num">{{ selected()!.route.durationMin }}</span>
+          <span class="info-unit">Min.</span>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Startpunkt</span>
+        <span class="info-value">
+          {{ selected()!.startPoint.name }}
+          <span class="coords">({{ selected()!.startPoint.latitude }}, {{ selected()!.startPoint.longitude }})</span>
+        </span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Endpunkt</span>
+        <span class="info-value">
+          {{ selected()!.endPoint.name }}
+          <span class="coords">({{ selected()!.endPoint.latitude }}, {{ selected()!.endPoint.longitude }})</span>
+        </span>
+      </div>
+
+      @if (selected()!.poi.length > 0) {
+        <div class="info-row">
+          <span class="info-label">POIs</span>
+          <div class="info-value">
+            @for (p of selected()!.poi; track p.name) {
+              <div>{{ p.name }}</div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Actions -->
+      <div class="detail-actions">
+        <button class="btn-edit" type="button" (click)="startEdit()">✏️ Bearbeiten</button>
+        <button class="btn-delete" type="button" (click)="delete()">🗑 Löschen</button>
+      </div>
+    }
+  </div>
+}

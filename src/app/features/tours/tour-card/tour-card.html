@@ -1,23 +1,25 @@
 <button
+  class="tour-card"
+  [class.active]="active"
   type="button"
-  class="btn text-start border w-100"
-  [class.btn-primary]="active"
-  [class.btn-outline-primary]="!active"
   (click)="choose()"
 >
-  <div class="d-flex justify-content-between align-items-center mb-1">
-    <div class="fw-semibold">{{ tour.title }}</div>
+  <div class="card-icon category-{{ tour.category }}">{{ meta.icon }}</div>
 
-
-    <span
-      class="badge"
-      [class.bg-primary]="tour.category === 'hike'"
-      [class.bg-success]="tour.category === 'run'"
-      [class.bg-warning]="tour.category === 'bike'"
-      class="text-dark"
-    >
-      {{ tour.category }}
-    </span>
+  <div class="card-body">
+    <div class="card-title">{{ tour.title }}</div>
+    <div class="card-meta">
+      <span class="card-tag category-{{ tour.category }}">{{ meta.label }}</span>
+      <span class="card-stat">📏 {{ tour.route.distance }} km</span>
+      <span class="card-stat">⏱ {{ tour.route.durationMin }} Min.</span>
+    </div>
+    @if (tour.description) {
+      <div class="card-desc">{{ tour.description }}</div>
+    }
   </div>
 
+  <svg class="card-arrow" width="16" height="16" viewBox="0 0 24 24"
+       fill="none" stroke="currentColor" stroke-width="2.5">
+    <path d="m9 18 6-6-6-6"/>
+  </svg>
 </button>
