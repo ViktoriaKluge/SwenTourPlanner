@@ -1,0 +1,13 @@
+
+
+.list-group-item.active {
+  font-weight: 600;
+}
+
+.list-group-item {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
