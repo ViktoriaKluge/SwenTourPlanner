@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { Tour } from "../../../core/models/tour.model";
-
+import { Tour } from "../models/tour.model";
 
 @Component ({
     selector: 'app-tour-card',
@@ -9,7 +8,7 @@ import { Tour } from "../../../core/models/tour.model";
 })
 
 export class TourCardComponent {
-    @Input({ required: true}) tour!: Tour;
+    @Input({ required: true }) tour!: Tour;
 
     @Input({
         required: true,

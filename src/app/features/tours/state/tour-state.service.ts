@@ -1,15 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { TourService } from '../core/services/tour.service';
-import { AuthService } from '../core/services/auth.service';
-import { Category, Tour } from '../core/models/tour.model';
-import { Section } from '../core/models/session.model';
+import { TourService } from '../services/tour.service';
+import { AuthService } from '../../auth/services/auth.service';
+import { Category, Tour } from '../models/tour.model';
 
 @Injectable({ providedIn: 'root' })
-export class AppStateService {
+export class TourStateService {
   private readonly tourService = inject(TourService);
   private readonly authService = inject(AuthService);
-
-  readonly activeSession = this.authService.activeSession;
 
   readonly selectedCategory = signal<Category>('all');
   readonly searchText = signal<string>('');
@@ -18,7 +15,7 @@ export class AppStateService {
   readonly filteredTours = computed(() => {
     const q = this.searchText().trim().toLowerCase();
     const cat = this.selectedCategory();
-    const user = this.activeSession().username;
+    const user = this.authService.activeSession().username;
 
     return this.tourService.tours().filter((to) => {
       const userOk = to.username === user;
@@ -68,25 +65,5 @@ export class AppStateService {
   deleteTour(id: string): void {
     this.tourService.delete(id);
     this.selectedTourId.set(null);
-  }
-
-  login(username: string): void {
-    this.authService.login(username);
-  }
-
-  logout(): void {
-    this.authService.logout();
-  }
-
-  setActiveSection(section: Section): void {
-    this.authService.setActiveSection(section);
-  }
-
-  addSection(section: Section): void {
-    this.authService.addSection(section);
-  }
-
-  subtractSection(section: Section): void {
-    this.authService.subtractSection(section);
   }
 }

@@ -1,5 +1,5 @@
 import { Component, inject } from "@angular/core";
-import { AppStateService } from "../../state/app-state";
+import { AuthService } from "../../features/auth/services/auth.service";
 import { Section } from "../../core/models/session.model";
 
 @Component({
@@ -11,18 +11,18 @@ import { Section } from "../../core/models/session.model";
 })
 
 export class HeaderComponent {
-    private readonly state = inject(AppStateService);
-    readonly session = this.state.activeSession;
+    private readonly auth = inject(AuthService);
+    readonly session = this.auth.activeSession;
 
     constructor() {
-    console.log('✅ HeaderComponent geladen!');
+        console.log('✅ HeaderComponent geladen!');
     }
 
     logout(): void {
-        this.state.logout();
+        this.auth.logout();
     }
 
     goTo(section: Section): void {
-       this.state.setActiveSection(section);
+        this.auth.setActiveSection(section);
     }
 }

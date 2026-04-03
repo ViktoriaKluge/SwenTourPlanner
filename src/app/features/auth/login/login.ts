@@ -1,5 +1,5 @@
 import { Component, inject } from "@angular/core";
-import { AppStateService } from "../../../state/app-state";
+import { AuthService } from "../services/auth.service";
 import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 
 @Component ({
@@ -11,7 +11,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 })
 
 export class LoginComponent {
-    private readonly state = inject(AppStateService);
+    private readonly auth = inject(AuthService);
     loginForm: FormGroup;
 
     constructor(private builder: FormBuilder) {
@@ -21,11 +21,11 @@ export class LoginComponent {
         });
     }
 
-    login(): void{
+    login(): void {
         console.log('Login wurde aufgerufen!');
         if (this.loginForm.valid) {
-            let name = this.loginForm.get('username')?.value;
-            this.state.login(name);
+            const name = this.loginForm.get('username')?.value;
+            this.auth.login(name);
         }
     }
 }

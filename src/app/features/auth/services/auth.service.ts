@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Section, Session } from '../models/session.model';
+import { Section, Session } from '../../../core/models/session.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

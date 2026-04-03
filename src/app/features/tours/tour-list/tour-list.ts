@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
-import { AppStateService} from "../../../state/app-state";
+import { TourStateService } from "../state/tour-state.service";
 import { TourCardComponent } from "../tour-card/tour-card";
-import { Tour } from "../../../core/models/tour.model";
+import { Tour } from "../models/tour.model";
 
 @Component ({
     selector: 'app-tour-list',
@@ -11,12 +11,12 @@ import { Tour } from "../../../core/models/tour.model";
 })
 
 export class TourListComponent {
-    private readonly state= inject(AppStateService);
+    private readonly state = inject(TourStateService);
 
-    readonly tours= this.state.filteredTours;
-    readonly selectedId= this.state.selectedTourId;
+    readonly tours = this.state.filteredTours;
+    readonly selectedId = this.state.selectedTourId;
 
-    onSelect(tour:Tour): void {
+    onSelect(tour: Tour): void {
         this.state.selectTour(tour.id);
     }
 }

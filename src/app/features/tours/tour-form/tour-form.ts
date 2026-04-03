@@ -1,7 +1,8 @@
 import { Component, computed, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AppStateService } from '../../../state/app-state';
-import { Tour } from '../../../core/models/tour.model';
+import { TourStateService } from '../state/tour-state.service';
+import { AuthService } from '../../auth/services/auth.service';
+import { Tour } from '../models/tour.model';
 
 @Component({
   selector: 'app-tour-form',
@@ -13,8 +14,9 @@ import { Tour } from '../../../core/models/tour.model';
 export class TourFormComponent {
   readonly cancelled = output<void>();
 
-  private readonly state = inject(AppStateService);
-  readonly showForm = computed(() => this.state.activeSession().sections.includes('addTour'));
+  private readonly state = inject(TourStateService);
+  private readonly auth = inject(AuthService);
+  readonly showForm = computed(() => this.auth.activeSession().sections.includes('addTour'));
   readonly tour = input<Tour | null>(null);
 
   tourForm: FormGroup;
@@ -59,7 +61,7 @@ export class TourFormComponent {
     } else {
       this.state.addTour({
         id: crypto.randomUUID(),
-        username: this.state.activeSession().username,
+        username: this.auth.activeSession().username,
         title: v.title,
         category: v.category,
         description: v.description,
@@ -70,7 +72,7 @@ export class TourFormComponent {
         route: v.route,
         logs: [],
       });
-      this.state.subtractSection('addTour');
+      this.auth.subtractSection('addTour');
     }
 
     this.cancelled.emit();
@@ -78,6 +80,6 @@ export class TourFormComponent {
 
   cancel(): void {
     this.cancelled.emit();
-    this.state.subtractSection('addTour');
+    this.auth.subtractSection('addTour');
   }
 }

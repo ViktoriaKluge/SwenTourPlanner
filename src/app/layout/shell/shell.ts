@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { HeaderComponent } from "../header/header";
-import { AppStateService } from "../../state/app-state";
+import { AuthService } from "../../features/auth/services/auth.service";
 import { AboutComponent } from "../../features/about/about";
 import { LoginComponent } from "../../features/auth/login/login";
 import { HomeComponent } from "../../features/tours/home/home";
@@ -14,6 +14,6 @@ import { HomeComponent } from "../../features/tours/home/home";
 })
 
 export class ShellComponent {
-    private readonly state = inject(AppStateService);
-    readonly session = this.state.activeSession;
+    private readonly auth = inject(AuthService);
+    readonly session = this.auth.activeSession;
 }

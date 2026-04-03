@@ -1,9 +1,9 @@
 import { Component, inject, signal } from "@angular/core";
-import { SidebarComponent } from "../../../layout/sidebar/sidebar";
+import { SidebarComponent } from "../sidebar/sidebar";
 import { DetailsComponent } from "../tour-details/tour-details";
-import { AppStateService } from "../../../state/app-state";
+import { AuthService } from "../../auth/services/auth.service";
 import { TourListComponent } from "../tour-list/tour-list";
-import { ToolbarComponent } from "../../../layout/toolbar/toolbar";
+import { ToolbarComponent } from "../toolbar/toolbar";
 
 @Component({
     selector: 'app-home',
@@ -15,6 +15,6 @@ import { ToolbarComponent } from "../../../layout/toolbar/toolbar";
 
 export class HomeComponent {
     protected readonly title = signal('TourPlanner')
-    private readonly state = inject(AppStateService);
-    readonly session = this.state.activeSession;
+    private readonly auth = inject(AuthService);
+    readonly session = this.auth.activeSession;
 }

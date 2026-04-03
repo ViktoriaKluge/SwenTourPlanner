@@ -1,15 +1,15 @@
 import { Component, inject } from '@angular/core';
-import { AppStateService} from '../../state/app-state';
-import { Category } from '../../core/models/tour.model';
+import { TourStateService } from '../state/tour-state.service';
+import { Category } from '../models/tour.model';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
   templateUrl: './sidebar.html',
-  styleUrls: ['../../app.css', './sidebar.css']
+  styleUrls: ['../../../app.css', './sidebar.css']
 })
 export class SidebarComponent {
-  private readonly state = inject(AppStateService);
+  private readonly state = inject(TourStateService);
 
   readonly categories: { id: Category; label: string }[] = [
     { id: 'all', label: 'All' },

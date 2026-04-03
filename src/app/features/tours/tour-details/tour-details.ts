@@ -1,5 +1,5 @@
 import { Component, inject, signal } from "@angular/core";
-import { AppStateService } from "../../../state/app-state";
+import { TourStateService } from "../state/tour-state.service";
 import { TourFormComponent } from "../tour-form/tour-form";
 
 @Component ({
@@ -11,7 +11,7 @@ import { TourFormComponent } from "../tour-form/tour-form";
 })
 
 export class DetailsComponent {
-    private readonly state = inject(AppStateService);
+    private readonly state = inject(TourStateService);
 
     readonly selected = this.state.selectedTour;
     readonly editing = signal(false);

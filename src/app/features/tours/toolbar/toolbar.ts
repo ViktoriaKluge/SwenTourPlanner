@@ -1,28 +1,29 @@
 import { Component, inject } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { AppStateService } from "../../state/app-state";
-import { TourFormComponent } from "../../features/tours/tour-form/tour-form";
+import { TourStateService } from "../state/tour-state.service";
+import { AuthService } from "../../auth/services/auth.service";
+import { TourFormComponent } from "../tour-form/tour-form";
 
 @Component({
     selector: 'app-toolbar',
     standalone: true,
     imports: [FormsModule, TourFormComponent],
     templateUrl: './toolbar.html',
-    styleUrls: ['../../app.css', './toolbar.css']
+    styleUrls: ['../../../app.css', './toolbar.css']
 })
 
 export class ToolbarComponent {
-    private readonly state = inject(AppStateService);
+    private readonly state = inject(TourStateService);
+    private readonly auth = inject(AuthService);
 
     readonly search = this.state.searchText;
-
 
     setSearch(v: string): void {
         this.state.setSearch(v);
     }
 
     add(): void {
-       this.state.addSection('addTour');
+        this.auth.addSection('addTour');
     }
 
     clear(): void {
