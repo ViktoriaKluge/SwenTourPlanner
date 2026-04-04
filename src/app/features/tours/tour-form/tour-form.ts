@@ -34,8 +34,12 @@ export class TourFormComponent {
   // ── Show validation errors after first submit attempt ──
   readonly submitted = signal(false);
 
+  // Tracks form status changes so errorSummary re-runs when fields are corrected
+  private readonly _formStatus = signal<string | null>(null);
+
   // ── Error summary computed from form ──
   readonly errorSummary = computed(() => {
+    this._formStatus(); // register dependency on form status
     if (!this.submitted()) return [];
     const errors: string[] = [];
     const push = (ctrl: AbstractControl | null, label: string) => {
@@ -151,6 +155,9 @@ export class TourFormComponent {
         }
       }
     });
+
+    // Keep _formStatus signal in sync so errorSummary computed re-runs on field changes
+    this.tourForm.statusChanges.subscribe((s) => this._formStatus.set(s));
 
     // Auto-save draft on every change (only for new tours)
     this.tourForm.valueChanges.subscribe((v) => {

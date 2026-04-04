@@ -1,11 +1,8 @@
-import { Injectable, PLATFORM_ID, effect, inject, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { Tour } from '../models/tour.model';
 
 @Injectable({ providedIn: 'root' })
 export class TourService {
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-
   readonly tours = signal<Tour[]>([
     {
       id: crypto.randomUUID(),
@@ -49,15 +46,11 @@ export class TourService {
   ]);
 
   constructor() {
-    if (this.isBrowser) {
-      const saved = localStorage.getItem('tours');
-      if (saved) this.tours.set(JSON.parse(saved));
-    }
+    const saved = localStorage.getItem('tours');
+    if (saved) this.tours.set(JSON.parse(saved));
 
     effect(() => {
-      if (this.isBrowser) {
-        localStorage.setItem('tours', JSON.stringify(this.tours()));
-      }
+      localStorage.setItem('tours', JSON.stringify(this.tours()));
     });
   }
 

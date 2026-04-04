@@ -20,4 +20,8 @@ export class ShellComponent {
 
   readonly session      = this.auth.activeSession;
   readonly isAddingTour = this.tourState.isAddingTour;
+
+  goToLogin(): void {
+    this.auth.setActiveSection('login');
+  }
 }

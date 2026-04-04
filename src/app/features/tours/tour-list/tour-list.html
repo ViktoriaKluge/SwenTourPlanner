@@ -15,16 +15,11 @@
       }
     </div>
 
-    <!-- Infinite scroll sentinel -->
-    @if (hasMore()) {
-      <div #sentinel class="sentinel" aria-hidden="true">
-        <span class="loading-dots">
-          <span></span><span></span><span></span>
-        </span>
-      </div>
-    } @else {
-      <!-- Non-visible sentinel so observer always has an element -->
-      <div #sentinel class="sentinel-hidden" aria-hidden="true"></div>
-    }
+    <!-- Infinite scroll sentinel – always in DOM so @ViewChild(static:true) finds it -->
+    <div #sentinel class="sentinel-wrapper" aria-hidden="true">
+      @if (hasMore()) {
+        <span class="loading-dots"><span></span><span></span><span></span></span>
+      }
+    </div>
   }
 </div>

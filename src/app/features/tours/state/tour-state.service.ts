@@ -1,5 +1,4 @@
-import { Injectable, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { TourService } from '../data-access/tour.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { Tour } from '../models/tour.model';
@@ -14,12 +13,11 @@ const FILTERS_KEY = 'tour-filters';
 export class TourStateService {
   private readonly tourService  = inject(TourService);
   private readonly authService  = inject(AuthService);
-  private readonly isBrowser    = isPlatformBrowser(inject(PLATFORM_ID));
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ── Search ──
-  readonly searchInput = signal(this.restoreString(SEARCH_KEY, ''));
-  readonly searchText  = signal(this.restoreString(SEARCH_KEY, ''));
+  readonly searchInput = signal(localStorage.getItem(SEARCH_KEY) ?? '');
+  readonly searchText  = signal(localStorage.getItem(SEARCH_KEY) ?? '');
 
   // ── Category filters ──
   readonly activeFilters = signal<Set<ActivityFilter>>(
@@ -74,24 +72,20 @@ export class TourStateService {
     // Persist searchText whenever it changes
     effect(() => {
       const text = this.searchText();
-      if (this.isBrowser) {
-        if (text) {
-          localStorage.setItem(SEARCH_KEY, text);
-        } else {
-          localStorage.removeItem(SEARCH_KEY);
-        }
+      if (text) {
+        localStorage.setItem(SEARCH_KEY, text);
+      } else {
+        localStorage.removeItem(SEARCH_KEY);
       }
     });
 
     // Persist activeFilters whenever they change
     effect(() => {
       const filters = [...this.activeFilters()];
-      if (this.isBrowser) {
-        if (filters.length > 0) {
-          localStorage.setItem(FILTERS_KEY, JSON.stringify(filters));
-        } else {
-          localStorage.removeItem(FILTERS_KEY);
-        }
+      if (filters.length > 0) {
+        localStorage.setItem(FILTERS_KEY, JSON.stringify(filters));
+      } else {
+        localStorage.removeItem(FILTERS_KEY);
       }
     });
   }
@@ -171,14 +165,8 @@ export class TourStateService {
 
   // ── localStorage helpers ──
 
-  private restoreString(key: string, fallback: string): string {
-    if (typeof localStorage === 'undefined') return fallback;
-    return localStorage.getItem(key) ?? fallback;
-  }
-
   private restoreFilters(): ActivityFilter[] {
     try {
-      if (typeof localStorage === 'undefined') return [];
       const raw = localStorage.getItem(FILTERS_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw);
