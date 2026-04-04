@@ -4,10 +4,11 @@
   gap: 0;
 }
 
+/* Tile grid */
 .list-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
 }
 
 /* Empty state */
@@ -32,15 +33,11 @@
 }
 
 /* Infinite scroll sentinel */
-.sentinel {
+.sentinel-wrapper {
   display: flex;
   justify-content: center;
   padding: 1.25rem 0 0.5rem;
-}
-
-.sentinel-hidden {
-  height: 1px;
-  visibility: hidden;
+  min-height: 1px;
 }
 
 /* Loading dots animation */

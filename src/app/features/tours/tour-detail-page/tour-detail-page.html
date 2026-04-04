@@ -57,14 +57,25 @@
 
       @if (selected()!.poi.length > 0) {
         <div class="info-row">
-          <span class="info-label">POIs</span>
-          <div class="info-value">
+          <span class="info-label">Zwischenstopps & POIs</span>
+          <div class="poi-list">
             @for (p of selected()!.poi; track p.name) {
-              <div>{{ p.name }}</div>
+              <div class="poi-item">
+                <span class="poi-dot"></span>
+                {{ p.name }}
+                <span class="coords">({{ p.latitude }}, {{ p.longitude }})</span>
+              </div>
             }
           </div>
         </div>
       }
+
+      <!-- Map -->
+      <app-tour-map
+        [startPoint]="selected()!.startPoint"
+        [endPoint]="selected()!.endPoint"
+        [pois]="selected()!.poi"
+      />
 
       <!-- Actions -->
       <div class="detail-actions">

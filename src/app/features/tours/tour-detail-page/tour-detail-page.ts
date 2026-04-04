@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { TourStateService } from '../state/tour-state.service';
 import { TourFormComponent } from '../tour-form/tour-form';
+import { TourMapComponent } from '../tour-map/tour-map';
 
 @Component({
   selector: 'app-tour-detail-page',
   standalone: true,
-  imports: [TourFormComponent],
+  imports: [TourFormComponent, TourMapComponent],
   templateUrl: './tour-detail-page.html',
   styleUrls: ['./tour-detail-page.css'],
 })

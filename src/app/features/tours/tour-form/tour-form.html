@@ -65,7 +65,7 @@
       }
       <input id="startName" type="text" formControlName="name" placeholder="z. B. Parkplatz Malerwinkel" />
       @if (isInvalid('startPoint.name')) {
-        <span class="field-error">{{ getErrors('startPoint.name')[0] || 'Pflichtfeld' }}</span>
+        <span class="field-error">{{ getErrors('startPoint.name')[0] }}</span>
       }
     </div>
 
@@ -78,9 +78,9 @@
         @if (openInfo() === 'startLat') {
           <div class="info-box">{{ fieldInfos['startLat'].hint }}</div>
         }
-        <input id="startLat" type="number" formControlName="latitude" placeholder="48.2093" />
+        <input id="startLat" type="number" formControlName="latitude" placeholder="48.2093" step="0.0001" />
         @if (isInvalid('startPoint.latitude')) {
-          <span class="field-error">Pflichtfeld</span>
+          <span class="field-error">{{ getErrors('startPoint.latitude')[0] }}</span>
         }
       </div>
       <div class="field-group" [class.invalid]="isInvalid('startPoint.longitude')">
@@ -91,9 +91,9 @@
         @if (openInfo() === 'startLon') {
           <div class="info-box">{{ fieldInfos['startLon'].hint }}</div>
         }
-        <input id="startLon" type="number" formControlName="longitude" placeholder="12.9834" />
+        <input id="startLon" type="number" formControlName="longitude" placeholder="12.9834" step="0.0001" />
         @if (isInvalid('startPoint.longitude')) {
-          <span class="field-error">Pflichtfeld</span>
+          <span class="field-error">{{ getErrors('startPoint.longitude')[0] }}</span>
         }
       </div>
     </div>
@@ -113,7 +113,7 @@
       }
       <input id="endName" type="text" formControlName="name" placeholder="z. B. Gipfelkreuz" />
       @if (isInvalid('endPoint.name')) {
-        <span class="field-error">Pflichtfeld</span>
+        <span class="field-error">{{ getErrors('endPoint.name')[0] }}</span>
       }
     </div>
 
@@ -126,9 +126,9 @@
         @if (openInfo() === 'endLat') {
           <div class="info-box">{{ fieldInfos['endLat'].hint }}</div>
         }
-        <input id="endLat" type="number" formControlName="latitude" placeholder="48.2093" />
+        <input id="endLat" type="number" formControlName="latitude" placeholder="48.2093" step="0.0001" />
         @if (isInvalid('endPoint.latitude')) {
-          <span class="field-error">Pflichtfeld</span>
+          <span class="field-error">{{ getErrors('endPoint.latitude')[0] }}</span>
         }
       </div>
       <div class="field-group" [class.invalid]="isInvalid('endPoint.longitude')">
@@ -139,9 +139,9 @@
         @if (openInfo() === 'endLon') {
           <div class="info-box">{{ fieldInfos['endLon'].hint }}</div>
         }
-        <input id="endLon" type="number" formControlName="longitude" placeholder="12.9834" />
+        <input id="endLon" type="number" formControlName="longitude" placeholder="12.9834" step="0.0001" />
         @if (isInvalid('endPoint.longitude')) {
-          <span class="field-error">Pflichtfeld</span>
+          <span class="field-error">{{ getErrors('endPoint.longitude')[0] }}</span>
         }
       </div>
     </div>
@@ -160,7 +160,7 @@
       }
       <input id="distance" type="number" formControlName="distance" placeholder="12.5" min="0" step="0.1" />
       @if (isInvalid('route.distance')) {
-        <span class="field-error">{{ getErrors('route.distance')[0] || 'Pflichtfeld' }}</span>
+        <span class="field-error">{{ getErrors('route.distance')[0] }}</span>
       }
     </div>
     <div class="field-group" [class.invalid]="isInvalid('route.durationMin')">
@@ -173,10 +173,56 @@
       }
       <input id="duration" type="number" formControlName="durationMin" placeholder="90" min="0" />
       @if (isInvalid('route.durationMin')) {
-        <span class="field-error">{{ getErrors('route.durationMin')[0] || 'Pflichtfeld' }}</span>
+        <span class="field-error">{{ getErrors('route.durationMin')[0] }}</span>
       }
     </div>
   </div>
+
+  <!-- ── POIs / Zwischenstopps ── -->
+  <div class="section-label">📌 Zwischenstopps & POIs</div>
+  <div class="pois-list" formArrayName="pois">
+    @for (poi of poisArray.controls; track $index; let i = $index) {
+      <div class="poi-entry" [formGroupName]="i">
+        <div class="poi-entry-header">
+          <span class="poi-num">Stopp {{ i + 1 }}</span>
+          <button type="button" class="btn-remove-poi" (click)="removePoi(i)" aria-label="Stopp entfernen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="field-group" [class.invalid]="isPoiInvalid(i, 'name')">
+          <label>Name <span class="required">*</span></label>
+          <input type="text" formControlName="name" placeholder="z. B. Aussichtspunkt" />
+          @if (isPoiInvalid(i, 'name')) {
+            <span class="field-error">{{ getPoiErrors(i, 'name')[0] }}</span>
+          }
+        </div>
+        <div class="form-row">
+          <div class="field-group" [class.invalid]="isPoiInvalid(i, 'latitude')">
+            <label>Breitengrad <span class="required">*</span></label>
+            <input type="number" formControlName="latitude" placeholder="48.2093" step="0.0001" />
+            @if (isPoiInvalid(i, 'latitude')) {
+              <span class="field-error">{{ getPoiErrors(i, 'latitude')[0] }}</span>
+            }
+          </div>
+          <div class="field-group" [class.invalid]="isPoiInvalid(i, 'longitude')">
+            <label>Längengrad <span class="required">*</span></label>
+            <input type="number" formControlName="longitude" placeholder="12.9834" step="0.0001" />
+            @if (isPoiInvalid(i, 'longitude')) {
+              <span class="field-error">{{ getPoiErrors(i, 'longitude')[0] }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  <button type="button" class="btn-add-poi" (click)="addPoi()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+    Stopp hinzufügen
+  </button>
 
   <!-- ── Error summary ── -->
   @if (submitted() && errorSummary().length > 0) {
