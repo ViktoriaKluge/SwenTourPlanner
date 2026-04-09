@@ -1,0 +1,61 @@
+<div class="picker-container">
+  <div class="picker-header">
+    <h3>{{ title() }}</h3>
+    <button type="button" class="picker-close" (click)="cancel()" aria-label="Schließen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="picker-search">
+    <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      class="search-input"
+      type="text"
+      placeholder="Ort suchen… z. B. Schloss Schönbrunn"
+      autocomplete="off"
+      [value]="searchQuery()"
+      (input)="onSearchInput($any($event.target).value)"
+    />
+    @if (searching()) {
+      <span class="spinner"></span>
+    }
+
+    @if (suggestions().length > 0) {
+      <div class="suggestions">
+        @for (s of suggestions(); track s.place_id) {
+          <button type="button" class="suggestion-item" (click)="pickSuggestion(s)">
+            {{ s.display_name }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <p class="picker-hint">Ort suchen oder direkt auf die Karte klicken. Marker ist verschiebbar.</p>
+
+  <!-- Map -->
+  <div #mapEl class="picker-map"></div>
+
+  <!-- Coordinates feedback -->
+  @if (markerLat() !== null) {
+    <div class="coord-feedback">
+      <span class="coord-dot"></span>
+      {{ markerLat()!.toFixed(5) }}, {{ markerLon()!.toFixed(5) }}
+    </div>
+  } @else {
+    <div class="coord-feedback coord-feedback--empty">Noch kein Punkt gewählt.</div>
+  }
+
+  <!-- Actions -->
+  <div class="picker-actions">
+    <button type="button" class="btn-cancel" (click)="cancel()">Abbrechen</button>
+    <button type="button" class="btn-confirm" [disabled]="markerLat() === null" (click)="confirm()">
+      Übernehmen
+    </button>
+  </div>
+</div>

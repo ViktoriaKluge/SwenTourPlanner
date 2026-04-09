@@ -1,0 +1,22 @@
+<button
+  class="tour-card"
+  [class.active]="active"
+  type="button"
+  (click)="choose()"
+>
+  <div class="card-top">
+    <div class="card-icon category-{{ tour.category }}">{{ meta.icon }}</div>
+    <span class="card-tag category-{{ tour.category }}">{{ meta.label }}</span>
+  </div>
+
+  <div class="card-title">{{ tour.title }}</div>
+
+  @if (tour.description) {
+    <div class="card-desc">{{ tour.description }}</div>
+  }
+
+  <div class="card-stats">
+    <span class="card-stat">📏 {{ tour.route.distance }} km</span>
+    <span class="card-stat">⏱ {{ tour.route.durationMin }} Min.</span>
+  </div>
+</button>

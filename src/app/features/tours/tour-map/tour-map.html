@@ -1,0 +1,9 @@
+<div class="map-wrapper">
+  <div #mapEl class="map-container"></div>
+  @if (isLoading()) {
+    <div class="map-loading">
+      <span class="map-spinner"></span>
+      <span>Route wird geladen…</span>
+    </div>
+  }
+</div>

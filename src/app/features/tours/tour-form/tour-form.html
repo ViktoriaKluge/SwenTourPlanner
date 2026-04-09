@@ -1,0 +1,298 @@
+<form class="tour-form" [formGroup]="tourForm" (ngSubmit)="submit()" novalidate>
+  <div class="form-header">
+    <h2>{{ tour() ? 'Tour bearbeiten' : 'Tour hinzufügen' }}</h2>
+    <button type="button" class="btn-close-form" (click)="cancel()" aria-label="Schließen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M18 6 6 18M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ── Titel ── -->
+  <div class="field-group" [class.invalid]="isInvalid('title')">
+    <label for="title">Titel</label>
+    <input id="title" type="text" formControlName="title" placeholder="z. B. Königssee Rundweg" />
+    @if (isInvalid('title')) {
+      <span class="field-error">{{ getErrors('title')[0] }}</span>
+    }
+  </div>
+
+  <!-- ── Kategorie ── -->
+  <div class="field-group">
+    <label for="category">Kategorie</label>
+    <select id="category" formControlName="category">
+      <option value="hike">🥾 Wandern</option>
+      <option value="run">🏃 Laufen</option>
+      <option value="bike">🚴 Radfahren</option>
+    </select>
+  </div>
+
+  <!-- ── Beschreibung ── -->
+  <div class="field-group">
+    <label for="description">Beschreibung</label>
+    <textarea id="description" formControlName="description" placeholder="Kurze Beschreibung der Tour…" rows="3"></textarea>
+  </div>
+
+  <!-- ── Startpunkt ── -->
+  <div class="section-label">📍 Startpunkt</div>
+  <div formGroupName="startPoint" class="location-group">
+    <div class="loc-input-row">
+      <div class="field-group loc-name-field" [class.invalid]="isInvalid('startPoint.name')">
+        <label for="startName">Name / Suche</label>
+        <input
+          id="startName"
+          type="text"
+          formControlName="name"
+          placeholder="Ort eingeben oder auf Karte wählen…"
+          autocomplete="off"
+          (input)="onLocationNameInput('start', $any($event.target).value)"
+          (blur)="clearSuggestions('start')"
+        />
+        @if (isInvalid('startPoint.name')) {
+          <span class="field-error">{{ getErrors('startPoint.name')[0] }}</span>
+        }
+        @if (startSuggestions().length > 0) {
+          <div class="suggestions-dropdown">
+            @for (s of startSuggestions(); track s.place_id) {
+              <button type="button" class="suggestion-item" (click)="applySuggestion('start', s)">
+                {{ s.display_name }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <button type="button" class="btn-pick-map" (click)="openPicker('start')" title="Auf Karte wählen" aria-label="Startpunkt auf Karte wählen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Karte
+      </button>
+    </div>
+    @if (getCoordValue('start', 'latitude') !== null) {
+      <div class="coord-pill">
+        <span class="coord-dot coord-dot--start"></span>
+        {{ getCoordValue('start', 'latitude')!.toFixed(5) }},
+        {{ getCoordValue('start', 'longitude')!.toFixed(5) }}
+      </div>
+    } @else if (isInvalid('startPoint.latitude')) {
+      <span class="field-error">Koordinaten über Suche oder Karte wählen</span>
+    }
+  </div>
+
+  <!-- ── Endpunkt ── -->
+  <div class="section-label">🏁 Endpunkt</div>
+  <div formGroupName="endPoint" class="location-group">
+    <div class="loc-input-row">
+      <div class="field-group loc-name-field" [class.invalid]="isInvalid('endPoint.name')">
+        <label for="endName">Name / Suche</label>
+        <input
+          id="endName"
+          type="text"
+          formControlName="name"
+          placeholder="Ort eingeben oder auf Karte wählen…"
+          autocomplete="off"
+          (input)="onLocationNameInput('end', $any($event.target).value)"
+          (blur)="clearSuggestions('end')"
+        />
+        @if (isInvalid('endPoint.name')) {
+          <span class="field-error">{{ getErrors('endPoint.name')[0] }}</span>
+        }
+        @if (endSuggestions().length > 0) {
+          <div class="suggestions-dropdown">
+            @for (s of endSuggestions(); track s.place_id) {
+              <button type="button" class="suggestion-item" (click)="applySuggestion('end', s)">
+                {{ s.display_name }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <button type="button" class="btn-pick-map" (click)="openPicker('end')" title="Auf Karte wählen" aria-label="Endpunkt auf Karte wählen">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Karte
+      </button>
+    </div>
+    @if (getCoordValue('end', 'latitude') !== null) {
+      <div class="coord-pill">
+        <span class="coord-dot coord-dot--end"></span>
+        {{ getCoordValue('end', 'latitude')!.toFixed(5) }},
+        {{ getCoordValue('end', 'longitude')!.toFixed(5) }}
+      </div>
+    } @else if (isInvalid('endPoint.latitude')) {
+      <span class="field-error">Koordinaten über Suche oder Karte wählen</span>
+    }
+  </div>
+
+  <!-- ── Zwischenstopps & POIs ── -->
+  <div class="section-label">📌 Zwischenstopps & POIs</div>
+  <div class="pois-list" formArrayName="pois">
+    @for (poi of poisArray.controls; track $index; let i = $index) {
+      <div class="poi-entry" [formGroupName]="i">
+        <div class="poi-entry-header">
+          <span class="poi-num">Stopp {{ i + 1 }}</span>
+          <button type="button" class="btn-remove-poi" (click)="removePoi(i)" aria-label="Stopp entfernen">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Name + Suche -->
+        <div class="field-group" [class.invalid]="isPoiInvalid(i, 'name')">
+          <label>Name / Suche</label>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="z. B. Aussichtspunkt"
+            autocomplete="off"
+            (input)="onPoiNameInput(i, $any($event.target).value)"
+            (blur)="clearPoiSuggestions(i)"
+          />
+          @if (isPoiInvalid(i, 'name')) {
+            <span class="field-error">{{ getPoiErrors(i, 'name')[0] }}</span>
+          }
+          @if (poiSuggestions().length > i && poiSuggestions()[i].length > 0) {
+            <div class="suggestions-dropdown">
+              @for (s of poiSuggestions()[i]; track s.place_id) {
+                <button type="button" class="suggestion-item" (click)="applyPoiSuggestion(i, s)">
+                  {{ s.display_name }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Koordinaten: manuelle Eingabe als Fallback -->
+        <div class="poi-coord-row">
+          <div class="field-group" [class.invalid]="isPoiInvalid(i, 'latitude')">
+            <label>Breitengrad</label>
+            <input type="number" formControlName="latitude" placeholder="48.2093" step="0.0001" />
+            @if (isPoiInvalid(i, 'latitude')) {
+              <span class="field-error">{{ getPoiErrors(i, 'latitude')[0] }}</span>
+            }
+          </div>
+          <div class="field-group" [class.invalid]="isPoiInvalid(i, 'longitude')">
+            <label>Längengrad</label>
+            <input type="number" formControlName="longitude" placeholder="12.9834" step="0.0001" />
+            @if (isPoiInvalid(i, 'longitude')) {
+              <span class="field-error">{{ getPoiErrors(i, 'longitude')[0] }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  <button type="button" class="btn-add-poi" (click)="addPoi()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M12 5v14M5 12h14"/>
+    </svg>
+    Stopp hinzufügen
+  </button>
+
+  <!-- ── Vorschaukarte ── -->
+  @if (showFormMap()) {
+    <div class="section-label">🗺 Vorschaukarte</div>
+    <app-tour-map
+      [startPoint]="mapStart()"
+      [endPoint]="mapEnd()"
+      [pois]="mapPois()"
+    />
+  }
+
+  <!-- ── Route ── -->
+  <div class="section-label">📐 Route</div>
+
+  <div class="route-status" [class.route-status--loading]="routeLoading()" [class.route-status--ok]="!routeLoading() && routeDistanceKm() !== null">
+    @if (routeLoading()) {
+      <span class="route-status-spinner"></span>
+      <span>Route wird berechnet…</span>
+    } @else if (routeDistanceKm() !== null) {
+      <span>✓ {{ routeDistanceKm()!.toFixed(1) }} km via OSRM berechnet</span>
+    } @else {
+      <span>Start- und Endpunkt festlegen um Route zu berechnen</span>
+    }
+  </div>
+
+  <div formGroupName="route" class="form-row">
+    <div class="field-group" [class.invalid]="isInvalid('route.distance')">
+      <label for="distance">Distanz (km)</label>
+      <input id="distance" type="number" formControlName="distance" placeholder="12.5" min="0" step="0.1"
+             [class.auto-filled]="routeDistanceKm() !== null" />
+      @if (isInvalid('route.distance')) {
+        <span class="field-error">{{ getErrors('route.distance')[0] }}</span>
+      }
+    </div>
+    <div class="field-group" [class.invalid]="isInvalid('route.durationMin')">
+      <label for="duration">Dauer (Min.)</label>
+      <input id="duration" type="number" formControlName="durationMin" placeholder="90" min="0"
+             [class.auto-filled]="routeDistanceKm() !== null" />
+      @if (isInvalid('route.durationMin')) {
+        <span class="field-error">{{ getErrors('route.durationMin')[0] }}</span>
+      }
+    </div>
+  </div>
+
+  @if (routeDistanceKm() !== null) {
+    <div class="pace-group">
+      <div class="pace-labels">
+        <span [class.pace-active]="paceLevel() === -1">🐢 Gemütlich</span>
+        <span [class.pace-active]="paceLevel() === 0">🚶 Normal</span>
+        <span [class.pace-active]="paceLevel() === 1">⚡ Motiviert</span>
+      </div>
+      <input
+        type="range"
+        min="-1"
+        max="1"
+        step="1"
+        [value]="paceLevel()"
+        (input)="onPaceChange(+$any($event.target).value)"
+        class="pace-slider"
+        aria-label="Tempo"
+      />
+      <div class="pace-hint">
+        @if (paceLevel() === -1) { +25% Dauer }
+        @else if (paceLevel() === 1) { −25% Dauer }
+        @else { berechnete Dauer }
+      </div>
+    </div>
+  }
+
+  <!-- ── Error summary ── -->
+  @if (submitted() && errorSummary().length > 0) {
+    <div class="error-summary" role="alert">
+      <strong>Bitte korrigiere folgende Felder:</strong>
+      <ul>
+        @for (e of errorSummary(); track e) {
+          <li>{{ e }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <!-- ── Actions ── -->
+  <div class="form-actions">
+    <button type="button" class="btn-cancel" (click)="cancel()">Abbrechen</button>
+    <button type="submit" class="btn-submit">
+      {{ tour() ? 'Speichern' : 'Tour erstellen' }}
+    </button>
+  </div>
+</form>
+
+<!-- ── Location picker modal ── -->
+@if (activePickerField()) {
+  <div class="picker-overlay" (click)="closePicker()">
+    <div (click)="$event.stopPropagation()">
+      <app-location-picker
+        [title]="activePickerField() === 'start' ? 'Startpunkt wählen' : 'Endpunkt wählen'"
+        [initLat]="getCoordValue(activePickerField()!, 'latitude')"
+        [initLon]="getCoordValue(activePickerField()!, 'longitude')"
+        (picked)="applyPickedLocation($event)"
+        (closed)="closePicker()"
+      />
+    </div>
+  </div>
+}
