@@ -376,7 +376,6 @@ export class TourFormComponent {
         title: v.title,
         category: v.category,
         description: v.description,
-        image: v.image || 'tba',
         startPoint: v.startPoint,
         endPoint: v.endPoint,
         poi: v.pois ?? [],
