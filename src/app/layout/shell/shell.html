@@ -1,0 +1,32 @@
+<div>
+  <app-header></app-header>
+</div>
+
+<main class="shell-main">
+
+  @if (session().sections.includes('about')) {
+    <app-about></app-about>
+  }
+
+  @if (session().sections.includes('login')) {
+    <app-login></app-login>
+  }
+
+  @if (session().sections.includes('home') && session().loggedIn) {
+    @if (isAddingTour()) {
+      <!-- Add-Tour view: only the form, nothing else -->
+      <div class="add-tour-wrapper">
+        <app-tour-form />
+      </div>
+    } @else {
+      <app-tours-page></app-tours-page>
+    }
+  }
+
+  @if (session().sections.includes('home') && !session().loggedIn) {
+    <div class="not-logged-in">
+      <p>Bitte <a (click)="goToLogin()" style="cursor:pointer;color:#667eea">melde dich an</a>, um deine Touren zu sehen.</p>
+    </div>
+  }
+
+</main>

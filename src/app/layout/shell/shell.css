@@ -1,0 +1,21 @@
+.shell-main {
+  min-height: calc(100vh - 60px);
+}
+
+.add-tour-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.not-logged-in {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  color: #64748b;
+  font-size: 1rem;
+}

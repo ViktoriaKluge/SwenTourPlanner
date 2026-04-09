@@ -1,0 +1,225 @@
+/* ── Variables ── */
+:host {
+  --primary: #667eea;
+  --primary-dark: #764ba2;
+  --primary-light: #eef0fd;
+  --border: #e2e8f0;
+  --text: #2d3748;
+  --text-muted: #718096;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Page wrapper ── */
+.tours-page {
+  padding: 1.25rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Top bar ── */
+.top-bar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Search bar */
+.search-bar {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.65rem 2.5rem 0.65rem 2.5rem;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* Hide browser's native 'x' in search inputs */
+.search-input::-webkit-search-cancel-button { display: none; }
+
+.search-clear {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--text-muted);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  padding: 0;
+}
+
+.search-clear:hover {
+  background: var(--text);
+}
+
+/* Add button */
+.add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.45);
+}
+
+.add-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Category filter boxes ── */
+.filters {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.filter-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  min-width: 80px;
+}
+
+.filter-box:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.filter-box.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.filter-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.filter-label {
+  white-space: nowrap;
+}
+
+/* ── Main content: list + detail ── */
+.content {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.list-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-col {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Back button: hidden on desktop */
+.back-btn {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.back-btn:hover {
+  color: var(--primary-dark);
+}
+
+/* ── Responsive: mobile ── */
+@media (max-width: 767px) {
+  .tours-page {
+    padding: 1rem 0.75rem;
+  }
+
+  /* When a detail is open: hide the list, show detail full-width */
+  .content.has-detail .list-col {
+    display: none;
+  }
+
+  .content.has-detail .detail-col {
+    flex: 1;
+  }
+
+  .back-btn {
+    display: flex; /* show on mobile only */
+  }
+
+  .filter-box {
+    padding: 0.5rem 0.8rem;
+    min-width: 70px;
+  }
+}
+
+/* ── Responsive: tablet ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .content {
+    gap: 0.75rem;
+  }
+}
