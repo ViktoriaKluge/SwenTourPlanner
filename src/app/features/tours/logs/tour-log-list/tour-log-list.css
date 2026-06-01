@@ -1,0 +1,132 @@
+.log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.log-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-list-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+}
+
+.btn-add-log {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  background: #eef0fd;
+  color: #667eea;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-add-log:hover { background: #e0e4fc; }
+
+.log-empty {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* Log entry card */
+.log-entry {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  transition: border-color 0.15s;
+}
+
+.log-entry.editing {
+  border-color: #667eea;
+  background: #f5f7ff;
+}
+
+.log-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-date {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.log-entry-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-edit {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.btn-edit:hover { background: #eef0fd; color: #667eea; }
+
+.btn-delete {
+  background: #fff1f2;
+  color: #e11d48;
+}
+.btn-delete:hover { background: #ffe4e6; }
+
+.log-comment {
+  font-size: 0.88rem;
+  color: #334155;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.log-meta {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.log-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.log-badge--diff {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.log-badge--rating {
+  background: #fdf2f8;
+  color: #9d174d;
+  letter-spacing: 0.05em;
+}

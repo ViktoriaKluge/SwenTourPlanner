@@ -1,0 +1,158 @@
+.log-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+}
+
+.log-form-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.field-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.field-group input[type="date"],
+.field-group input[type="number"],
+.field-group textarea {
+  padding: 0.55rem 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  color: #2d3748;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.field-group input[type="date"]:focus,
+.field-group input[type="number"]:focus,
+.field-group textarea:focus {
+  border-color: #667eea;
+}
+
+.field-group textarea { resize: vertical; }
+
+.field-group.invalid input,
+.field-group.invalid textarea {
+  border-color: #fc8181;
+  background: #fff5f5;
+}
+
+.field-error {
+  font-size: 0.75rem;
+  color: #e53e3e;
+}
+.field-error::before { content: '⚠ '; }
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rating-slider {
+  flex: 1;
+  accent-color: #667eea;
+  cursor: pointer;
+}
+
+.rating-value {
+  min-width: 2rem;
+  text-align: center;
+  font-weight: 700;
+  color: #667eea;
+  font-size: 0.95rem;
+}
+
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: -0.1rem;
+}
+
+.log-form-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 0.55rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #4a5568;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-cancel:hover { background: #f7fafc; }
+
+.btn-submit {
+  flex: 2;
+  padding: 0.55rem;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-submit:hover { opacity: 0.9; }
+
+:host-context(.dark-mode) .log-form-header h3,
+:host-context(.dark-mode) .field-group label,
+:host-context(.dark-mode) .rating-labels {
+  color: #e5e7eb;
+}
+
+:host-context(.dark-mode) .log-form {
+  background: #111827;
+  border-color: #253044;
+}
+
+:host-context(.dark-mode) .field-group input[type="date"],
+:host-context(.dark-mode) .field-group input[type="number"],
+:host-context(.dark-mode) .field-group textarea {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+:host-context(.dark-mode) .btn-cancel {
+  background: #0f172a;
+  color: #e5e7eb;
+  border-color: #334155;
+}
+
+:host-context(.dark-mode) .btn-cancel:hover {
+  background: #1f2937;
+}
+
+:host-context(.dark-mode) .rating-value {
+  color: #a5b4fc;
+}

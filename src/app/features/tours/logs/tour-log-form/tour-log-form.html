@@ -1,0 +1,70 @@
+<form class="log-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <div class="log-form-header">
+    <h3>{{ log() ? 'Eintrag bearbeiten' : 'Neuer Eintrag' }}</h3>
+  </div>
+
+  <!-- Datum -->
+  <div class="field-group" [class.invalid]="isInvalid('date')">
+    <label for="log-date">Datum</label>
+    <input id="log-date" type="date" formControlName="date" />
+    @if (isInvalid('date')) {
+      <span class="field-error">{{ getError('date') }}</span>
+    }
+  </div>
+
+  <!-- Kommentar -->
+  <div class="field-group" [class.invalid]="isInvalid('comment')">
+    <label for="log-comment">Kommentar</label>
+    <textarea id="log-comment" formControlName="comment" rows="3" placeholder="Wie war die Tour?"></textarea>
+    @if (isInvalid('comment')) {
+      <span class="field-error">{{ getError('comment') }}</span>
+    }
+  </div>
+
+  <!-- Schwierigkeit -->
+  <div class="field-group" [class.invalid]="isInvalid('difficulty')">
+    <label for="log-difficulty">Schwierigkeit (1–5)</label>
+    <div class="rating-row">
+      <input id="log-difficulty" type="range" min="1" max="5" step="1" formControlName="difficulty" class="rating-slider" />
+      <span class="rating-value">{{ form.get('difficulty')?.value }}</span>
+    </div>
+    <div class="rating-labels">
+      <span>Einfach</span>
+      <span>Mittel</span>
+      <span>Sehr schwer</span>
+    </div>
+    @if (isInvalid('difficulty')) {
+      <span class="field-error">{{ getError('difficulty') }}</span>
+    }
+  </div>
+
+  <div class="field-group" [class.invalid]="isInvalid('totalTime')">
+    <label for="log-time">Gesamtzeit (Min.)</label>
+    <input id="log-time" type="number" min="0" formControlName="totalTime" />
+    @if (isInvalid('totalTime')) {
+      <span class="field-error">{{ getError('totalTime') }}</span>
+    }
+  </div>
+
+  <!-- Bewertung -->
+  <div class="field-group" [class.invalid]="isInvalid('rating')">
+    <label for="log-rating">Bewertung (1–5)</label>
+    <div class="rating-row">
+      <input id="log-rating" type="range" min="1" max="5" step="1" formControlName="rating" class="rating-slider" />
+      <span class="rating-value">{{ '★'.repeat(form.get('rating')?.value) }}</span>
+    </div>
+    <div class="rating-labels">
+      <span>Schlecht</span>
+      <span>Gut</span>
+      <span>Ausgezeichnet</span>
+    </div>
+    @if (isInvalid('rating')) {
+      <span class="field-error">{{ getError('rating') }}</span>
+    }
+  </div>
+
+  <div class="log-form-actions">
+    <button type="button" class="btn-cancel" (click)="cancel()">Abbrechen</button>
+    <button type="submit" class="btn-submit">{{ log() ? 'Speichern' : 'Hinzufügen' }}</button>
+  </div>
+</form>

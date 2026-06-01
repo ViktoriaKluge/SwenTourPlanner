@@ -1,0 +1,63 @@
+import { Component, inject, input, signal } from '@angular/core';
+import { TourViewModelService } from '../../view-model/tour-view-model.service';
+import { TourLog } from '../../models/tour.model';
+import { TourLogFormComponent } from '../tour-log-form/tour-log-form';
+
+@Component({
+  selector: 'app-tour-log-list',
+  standalone: true,
+  imports: [TourLogFormComponent],
+  templateUrl: './tour-log-list.html',
+  styleUrls: ['./tour-log-list.css'],
+})
+export class TourLogListComponent {
+  readonly tourId = input.required<string>();
+  readonly logs   = input<TourLog[]>([]);
+
+  private readonly state = inject(TourViewModelService);
+
+  readonly addingLog  = signal(false);
+  readonly editingLog = signal<TourLog | null>(null);
+
+  openAdd(): void {
+    this.addingLog.set(true);
+    this.editingLog.set(null);
+  }
+
+  startEdit(log: TourLog): void {
+    this.editingLog.set(log);
+    this.addingLog.set(false);
+  }
+
+  closeForm(): void {
+    this.addingLog.set(false);
+    this.editingLog.set(null);
+  }
+
+  async saveLog(log: TourLog): Promise<void> {
+    if (this.editingLog()) {
+      await this.state.updateLog(this.tourId(), log);
+    } else {
+      await this.state.addLog(this.tourId(), log);
+    }
+    this.closeForm();
+  }
+
+  async deleteLog(logId: string): Promise<void> {
+    await this.state.deleteLog(this.tourId(), logId);
+  }
+
+  formatDate(date: Date | string): string {
+    return new Date(date).toLocaleDateString('de-AT', {
+      year: 'numeric', month: 'long', day: 'numeric',
+    });
+  }
+
+  stars(n: number): string {
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  difficultyLabel(n: number): string {
+    return ['', 'Einfach', 'Leicht', 'Mittel', 'Schwer', 'Sehr schwer'][n] ?? `${n}`;
+  }
+}
