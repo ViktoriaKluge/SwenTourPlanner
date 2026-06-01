@@ -1,0 +1,28 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/tourplanner}
+    username: ${DB_USER:tourplanner}
+    password: ${DB_PASSWORD:tourplanner}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+
+app:
+  upload-dir: ${TOUR_IMAGE_DIR:./data/images}
+  open-route-service:
+    api-key: ${ORS_API_KEY:eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI0YmJiYzcxNTIxODRkMjRhODcwY2FiNjU0NjJkOTdlIiwiaCI6Im11cm11cjY0In0=}
+    base-url: ${ORS_BASE_URL:https://api.openrouteservice.org}
+  open-weather:
+    api-key: ${OPENWEATHER_API_KEY:41f13ab9a19f66502d48da02b7e8b1cd}
+    base-url: ${OPENWEATHER_BASE_URL:https://api.openweathermap.org}
+
+logging:
+  level:
+    at.fhtw.tourplanner: INFO
