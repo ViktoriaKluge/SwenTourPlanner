@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+/backend/target
 
 # Node
 /node_modules
@@ -13,11 +14,14 @@ yarn-error.log
 
 # IDEs and editors
 .idea/
+*.iml
 .project
 .classpath
 .c9/
 *.launch
 .settings/
+.claire/*
+.claude/*
 *.sublime-workspace
 
 # Visual Studio Code
@@ -30,7 +34,7 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
-/.angular/cache
+/.angular
 .sass-cache/
 /connect.lock
 /coverage
