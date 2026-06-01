@@ -1,7 +1,6 @@
 <div class="tour-list">
   @if (tours().length === 0) {
     <div class="empty-state">
-      <span class="empty-icon">🗺</span>
       <p>Keine Touren gefunden.</p>
     </div>
   } @else {
@@ -16,7 +15,6 @@
     </div>
   }
 
-  <!-- Sentinel always in DOM so @ViewChild(static:true) always finds it -->
   <div #sentinel class="sentinel-wrapper" aria-hidden="true">
     @if (hasMore()) {
       <span class="loading-dots"><span></span><span></span><span></span></span>

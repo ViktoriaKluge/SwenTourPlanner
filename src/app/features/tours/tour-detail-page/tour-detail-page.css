@@ -23,6 +23,12 @@
   margin: 0 0 0.4rem;
 }
 
+.detail-header-actions {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+}
+
 .category-badge {
   display: inline-block;
   padding: 0.2rem 0.65rem;
@@ -53,6 +59,27 @@
 
 .close-btn:hover { background: #e2e8f0; }
 
+.favorite-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #b45309;
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.favorite-btn.active {
+  background: #f59e0b;
+  color: #fff;
+}
+
 /* Info rows */
 .info-row {
   display: flex;
@@ -73,10 +100,11 @@
   color: #334155;
 }
 
-.coords {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin-left: 0.3rem;
+.hint-text {
+  display: block;
+  margin-top: 0.2rem;
+  color: #64748b;
+  font-size: 0.78rem;
 }
 
 /* Stats grid */
@@ -94,10 +122,6 @@
   background: #f8fafc;
   border-radius: 8px;
   gap: 0.15rem;
-}
-
-.info-icon {
-  font-size: 1.2rem;
 }
 
 .info-num {
@@ -123,17 +147,8 @@
 .poi-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
   font-size: 0.9rem;
   color: #334155;
-}
-
-.poi-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #3b82f6;
-  flex-shrink: 0;
 }
 
 /* Actions */
@@ -170,3 +185,205 @@
 }
 
 .btn-delete:hover { filter: brightness(0.95); }
+
+.btn-edit:disabled,
+.btn-delete:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.weather-card {
+  border: 1.5px solid #dbeafe;
+  border-radius: 8px;
+  background: #f8fbff;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.weather-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.weather-grid div {
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.weather-grid strong {
+  color: #1e293b;
+  font-size: 1rem;
+}
+
+.weather-grid span,
+.weather-message,
+.clothing-advice {
+  color: #64748b;
+  font-size: 0.86rem;
+}
+
+.weather-message,
+.clothing-advice {
+  margin: 0;
+}
+
+.clothing-advice {
+  border-radius: 8px;
+  background: #eef0fd;
+  color: #4f46e5;
+  padding: 0.65rem 0.8rem;
+  font-weight: 700;
+}
+
+.delete-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.5);
+  padding: 1rem;
+}
+
+.delete-modal {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border: 1.5px solid #fecaca;
+  border-radius: 8px;
+  background: #fff;
+  padding: 1.2rem;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+}
+
+.delete-modal h3 {
+  margin: 0;
+  color: #991b1b;
+  font-size: 1.1rem;
+}
+
+.delete-modal p {
+  margin: 0;
+  color: #475569;
+  font-size: 0.92rem;
+}
+
+.delete-error {
+  margin-top: 0.5rem !important;
+  color: #b91c1c !important;
+  font-weight: 600;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.btn-keep,
+.btn-confirm-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-keep {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.btn-confirm-delete {
+  background: #e11d48;
+  color: #fff;
+}
+
+.btn-keep:disabled,
+.btn-confirm-delete:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.spinner {
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+:host-context(.dark-mode) .detail-card,
+:host-context(.dark-mode) .weather-grid div,
+:host-context(.dark-mode) .delete-modal {
+  background: #111827;
+  color: #e5e7eb;
+}
+
+:host-context(.dark-mode) .info-card {
+  background: #1f2937;
+}
+
+:host-context(.dark-mode) .detail-title,
+:host-context(.dark-mode) .info-num,
+:host-context(.dark-mode) .weather-grid strong {
+  color: #f8fafc;
+}
+
+:host-context(.dark-mode) .info-value,
+:host-context(.dark-mode) .poi-item,
+:host-context(.dark-mode) .weather-message {
+  color: #d1d5db;
+}
+
+:host-context(.dark-mode) .weather-card {
+  background: #0f172a;
+  border-color: #253044;
+}
+
+:host-context(.dark-mode) .clothing-advice {
+  background: #1f2937;
+  color: #c4b5fd;
+}
+
+:host-context(.dark-mode) .delete-modal p {
+  color: #cbd5e1;
+}
+
+@media (max-width: 767px) {
+  .close-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .weather-grid {
+    grid-template-columns: 1fr;
+  }
+}

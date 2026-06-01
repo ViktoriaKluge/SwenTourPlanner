@@ -1,73 +1,125 @@
 <div class="tours-page">
+  @if (loading()) {
+    <div class="page-loading" aria-live="polite">
+      <span class="spinner spinner-dark" aria-hidden="true"></span>
+      <span>Touren werden geladen...</span>
+    </div>
+  }
 
-  <!-- ── Top bar: search + add ── -->
-  <div class="top-bar">
-    <div class="search-bar">
-      <span class="search-icon" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-      </span>
-      <input
-        class="search-input"
-        type="search"
-        placeholder="Touren suchen…"
-        autocomplete="off"
-        [value]="searchInput()"
-        (input)="onInput($event)"
-        aria-label="Touren suchen"
-      />
-      @if (searchInput()) {
-        <button class="search-clear" type="button" (click)="clearSearch()" aria-label="Suche leeren">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M18 6 6 18M6 6l12 12"/>
+  @if (error()) {
+    <div class="page-error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="overview-only" [class.hide-on-mobile-detail]="!!selectedTour()">
+    @if (!selectedTour()) {
+      <section class="overview-hero" aria-label="Touruebersicht">
+        <div class="overview-stat">
+          <strong>{{ overview().completedTourCount }}</strong>
+          <span>gemachte Touren</span>
+        </div>
+        <div class="overview-stat">
+          <strong>{{ overview().completedDistance }}</strong>
+          <span>km zurueckgelegt</span>
+        </div>
+        <div class="overview-stat">
+          <strong>{{ overview().completedDuration }}</strong>
+          <span>Minuten unterwegs</span>
+        </div>
+      </section>
+
+      <section class="overview-highlights" aria-label="Aktuelle Touren">
+        <button class="highlight-tile" type="button" [disabled]="!overview().latestTour" (click)="overview().latestTour && state.selectTour(overview().latestTour!.id)">
+          <span>Letzte Tour</span>
+          @if (overview().latestTour; as latestTour) {
+            <strong>
+              @if (latestTour.favorite) { <span class="favorite-inline" aria-label="Favorit">★</span> }
+              {{ latestTour.title }}
+            </strong>
+          } @else {
+            <strong>Noch keine Tour</strong>
+          }
+        </button>
+        <button class="highlight-tile" type="button" [disabled]="!overview().plannedTour" (click)="overview().plannedTour && state.selectTour(overview().plannedTour!.id)">
+          <span>Geplante Tour</span>
+          @if (overview().plannedTour; as plannedTour) {
+            <strong>
+              @if (plannedTour.favorite) { <span class="favorite-inline" aria-label="Favorit">★</span> }
+              {{ plannedTour.title }}
+            </strong>
+          } @else {
+            <strong>Keine geplante Tour</strong>
+          }
+        </button>
+      </section>
+    }
+
+    <div class="top-bar">
+      <div class="search-bar">
+        <span class="search-icon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
+        </span>
+        <input
+          class="search-input"
+          type="search"
+          placeholder="Touren suchen..."
+          autocomplete="off"
+          [value]="searchInput()"
+          (input)="onInput($event)"
+          aria-label="Touren suchen"
+        />
+        @if (searchInput()) {
+          <button class="search-clear" type="button" (click)="clearSearch()" aria-label="Suche leeren">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        }
+      </div>
+      <button class="add-btn" type="button" (click)="openAddForm()" aria-label="Tour hinzufuegen" title="Tour hinzufuegen">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 5v14M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="list-mode" role="group" aria-label="Tourlistenansicht">
+      <button type="button" [class.active]="listMode() === 'all'" (click)="setListMode('all')">Alle Touren</button>
+      <button type="button" [class.active]="listMode() === 'favorites'" (click)="setListMode('favorites')">Favoriten ({{ favoriteCount() }})</button>
+    </div>
+
+    <div class="filters" role="group" aria-label="Nach Aktivitaet filtern">
+      @for (f of filterDefs; track f.id) {
+        <button
+          class="filter-box"
+          [class.active]="isActive(f.id)"
+          type="button"
+          (click)="toggleFilter(f.id)"
+          [attr.aria-pressed]="isActive(f.id)"
+        >
+          <span class="filter-icon">{{ f.icon }}</span>
+          <span class="filter-label">{{ f.label }}</span>
         </button>
       }
     </div>
-    <button class="add-btn" type="button" (click)="openAddForm()" aria-label="Tour hinzufügen" title="Tour hinzufügen">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-    </button>
   </div>
 
-  <!-- ── Category filter boxes ── -->
-  <div class="filters" role="group" aria-label="Nach Aktivität filtern">
-    @for (f of filterDefs; track f.id) {
-      <button
-        class="filter-box"
-        [class.active]="isActive(f.id)"
-        type="button"
-        (click)="toggleFilter(f.id)"
-        [attr.aria-pressed]="isActive(f.id)"
-      >
-        <span class="filter-icon">{{ f.icon }}</span>
-        <span class="filter-label">{{ f.label }}</span>
-      </button>
-    }
-  </div>
-
-  <!-- ── Main content area ── -->
   <div class="content" [class.has-detail]="!!selectedTour()">
-
-    <!-- Tour list (left column) -->
     <section class="list-col" aria-label="Tourliste">
       <app-tour-list></app-tour-list>
     </section>
 
-    <!-- Detail panel (right column on desktop, full-screen on mobile) -->
     @if (selectedTour()) {
       <section class="detail-col" aria-label="Tour-Details">
         <button class="back-btn" type="button" (click)="backToList()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="m15 18-6-6 6-6"/>
           </svg>
-          Zurück
+          Zurueck
         </button>
         <app-tour-detail-page></app-tour-detail-page>
       </section>
     }
-
   </div>
 </div>

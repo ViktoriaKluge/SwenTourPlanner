@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { TourStateService, ActivityFilter } from '../state/tour-state.service';
+import { ActivityFilter, TourListMode, TourViewModelService } from '../view-model/tour-view-model.service';
 import { TourListComponent } from '../tour-list/tour-list';
 import { TourDetailPageComponent } from '../tour-detail-page/tour-detail-page';
 
@@ -11,17 +11,22 @@ import { TourDetailPageComponent } from '../tour-detail-page/tour-detail-page';
   styleUrls: ['./tours-page.css'],
 })
 export class ToursPageComponent {
-  protected readonly state = inject(TourStateService);
+  protected readonly state = inject(TourViewModelService);
 
-  readonly searchInput  = this.state.searchInput;
+  readonly searchInput = this.state.searchInput;
   readonly activeFilters = this.state.activeFilters;
-  readonly selectedTour  = this.state.selectedTour;
-  readonly hasMore       = this.state.hasMore;
+  readonly selectedTour = this.state.selectedTour;
+  readonly hasMore = this.state.hasMore;
+  readonly loading = this.state.loading;
+  readonly error = this.state.error;
+  readonly listMode = this.state.listMode;
+  readonly favoriteCount = this.state.favoriteCount;
+  readonly overview = this.state.overview;
 
   readonly filterDefs: { id: ActivityFilter; icon: string; label: string }[] = [
-    { id: 'hike', icon: '🥾', label: 'Hiking'   },
-    { id: 'run',  icon: '🏃', label: 'Running'  },
-    { id: 'bike', icon: '🚴', label: 'Cycling'  },
+    { id: 'hike', icon: 'W', label: 'Wandern' },
+    { id: 'run', icon: 'L', label: 'Laufen' },
+    { id: 'bike', icon: 'R', label: 'Radfahren' },
   ];
 
   isActive(id: ActivityFilter): boolean {
@@ -38,6 +43,10 @@ export class ToursPageComponent {
 
   toggleFilter(id: ActivityFilter): void {
     this.state.toggleFilter(id);
+  }
+
+  setListMode(mode: TourListMode): void {
+    this.state.setListMode(mode);
   }
 
   openAddForm(): void {

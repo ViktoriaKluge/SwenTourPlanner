@@ -1,36 +1,27 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
-import { TourStateService } from '../state/tour-state.service';
+import { TourViewModelService } from '../view-model/tour-view-model.service';
 import { AuthService } from '../../auth/services/auth.service';
+import { LocationPickerComponent } from './location-picker/location-picker';
 import { Tour } from '../models/tour.model';
+import { calcDurationMin, fetchOsrmRoute, isValidCoord } from '../utils/routing';
 
 const DRAFT_KEY = 'tour-form-draft';
 
-export interface FieldInfo {
-  label: string;
-  hint: string;
-  errorMessages: Record<string, string>;
+interface NominatimResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
 }
 
-// Maps form control path → fieldInfos key for correct error lookup
-const PATH_TO_FIELD: Record<string, string> = {
-  'title':                  'title',
-  'category':               'category',
-  'description':            'description',
-  'startPoint.name':        'startName',
-  'startPoint.latitude':    'startLat',
-  'startPoint.longitude':   'startLon',
-  'endPoint.name':          'endName',
-  'endPoint.latitude':      'endLat',
-  'endPoint.longitude':     'endLon',
-  'route.distance':         'distance',
-  'route.durationMin':      'durationMin',
-};
+type PickerTarget = 'start' | 'end' | `poi:${number}`;
+type RoutePoint = { latitude: number; longitude: number };
 
 @Component({
   selector: 'app-tour-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LocationPickerComponent],
   templateUrl: './tour-form.html',
   styleUrls: ['./tour-form.css'],
 })
@@ -38,104 +29,50 @@ export class TourFormComponent {
   readonly cancelled = output<void>();
   readonly tour = input<Tour | null>(null);
 
-  private readonly state = inject(TourStateService);
-  private readonly auth  = inject(AuthService);
+  private readonly state = inject(TourViewModelService);
+  private readonly auth = inject(AuthService);
 
   tourForm: FormGroup;
 
-  readonly openInfo  = signal<string | null>(null);
   readonly submitted = signal(false);
+  readonly saving = signal(false);
+  readonly saveError = signal<string | null>(null);
+  readonly activePickerField = signal<PickerTarget | null>(null);
+  readonly startSuggestions = signal<NominatimResult[]>([]);
+  readonly endSuggestions = signal<NominatimResult[]>([]);
+  readonly poiSuggestions = signal<{ index: number; results: NominatimResult[] } | null>(null);
 
-  private readonly _formStatus = signal<string | null>(null);
+  private readonly formStatus = signal<string | null>(null);
+  readonly routeStatus = signal<string>('Start und Ziel waehlen, dann wird die Route berechnet.');
+  private geocodeTimer: ReturnType<typeof setTimeout> | null = null;
+  private routeTimer: ReturnType<typeof setTimeout> | null = null;
+  private hydrating = false;
 
   readonly errorSummary = computed(() => {
-    this._formStatus();
+    this.formStatus();
     if (!this.submitted()) return [];
     const errors: string[] = [];
     const push = (ctrl: AbstractControl | null, label: string) => {
       if (!ctrl || ctrl.valid) return;
       const e = ctrl.errors ?? {};
-      if (e['required'])   errors.push(`${label}: Pflichtfeld`);
-      if (e['min'])        errors.push(`${label}: Muss ≥ ${e['min'].min} sein`);
-      if (e['max'])        errors.push(`${label}: Muss ≤ ${e['max'].max} sein`);
-      if (e['minlength'])  errors.push(`${label}: Mindestens ${e['minlength'].requiredLength} Zeichen`);
+      if (e['required']) errors.push(`${label}: Pflichtfeld`);
+      if (e['min']) errors.push(`${label}: Muss >= ${e['min'].min} sein`);
+      if (e['max']) errors.push(`${label}: Muss <= ${e['max'].max} sein`);
+      if (e['minlength']) errors.push(`${label}: Mindestens ${e['minlength'].requiredLength} Zeichen`);
     };
-    push(this.tourForm.get('title'),                'Titel');
-    push(this.tourForm.get('category'),             'Kategorie');
-    push(this.tourForm.get('startPoint.name'),      'Startpunkt Name');
-    push(this.tourForm.get('startPoint.latitude'),  'Startpunkt Breitengrad');
-    push(this.tourForm.get('startPoint.longitude'), 'Startpunkt Längengrad');
-    push(this.tourForm.get('endPoint.name'),        'Endpunkt Name');
-    push(this.tourForm.get('endPoint.latitude'),    'Endpunkt Breitengrad');
-    push(this.tourForm.get('endPoint.longitude'),   'Endpunkt Längengrad');
-    push(this.tourForm.get('route.distance'),       'Distanz');
-    push(this.tourForm.get('route.durationMin'),    'Dauer');
-    // POI errors
+    push(this.tourForm.get('title'), 'Titel');
+    push(this.tourForm.get('startPoint.name'), 'Startpunkt Name');
+    push(this.tourForm.get('startPoint.latitude'), 'Startpunkt Koordinaten');
+    push(this.tourForm.get('endPoint.name'), 'Endpunkt Name');
+    push(this.tourForm.get('endPoint.latitude'), 'Endpunkt Koordinaten');
+    push(this.tourForm.get('route.distance'), 'Distanz');
+    push(this.tourForm.get('route.durationMin'), 'Dauer');
     this.poisArray.controls.forEach((g, i) => {
-      push(g.get('name'),      `POI ${i + 1} Name`);
-      push(g.get('latitude'),  `POI ${i + 1} Breitengrad`);
-      push(g.get('longitude'), `POI ${i + 1} Längengrad`);
+      push(g.get('name'), `Stopp ${i + 1} Name`);
+      push(g.get('latitude'), `Stopp ${i + 1} Koordinaten`);
     });
     return errors;
   });
-
-  readonly fieldInfos: Record<string, FieldInfo> = {
-    title: {
-      label: 'Titel',
-      hint: 'Gib der Tour einen eindeutigen, beschreibenden Namen.',
-      errorMessages: { required: 'Ein Titel ist erforderlich.', minlength: 'Mindestens 2 Zeichen.' },
-    },
-    category: {
-      label: 'Kategorie',
-      hint: 'Wähle die passende Aktivitätsart für diese Tour.',
-      errorMessages: { required: 'Eine Kategorie ist erforderlich.' },
-    },
-    description: {
-      label: 'Beschreibung',
-      hint: 'Optionale Beschreibung – z. B. Schwierigkeitsgrad, Highlights.',
-      errorMessages: {},
-    },
-    startName: {
-      label: 'Startpunkt Name',
-      hint: 'Bezeichnung des Startorts, z. B. „Parkplatz Waldhütte".',
-      errorMessages: { required: 'Name des Startpunkts ist erforderlich.' },
-    },
-    startLat: {
-      label: 'Breitengrad (Start)',
-      hint: 'GPS-Breitengrad zwischen –90 und 90. Beispiel: 48.2093',
-      errorMessages: { required: 'Pflichtfeld.', min: 'Muss ≥ –90 sein.', max: 'Muss ≤ 90 sein.' },
-    },
-    startLon: {
-      label: 'Längengrad (Start)',
-      hint: 'GPS-Längengrad zwischen –180 und 180. Beispiel: 16.3728',
-      errorMessages: { required: 'Pflichtfeld.', min: 'Muss ≥ –180 sein.', max: 'Muss ≤ 180 sein.' },
-    },
-    endName: {
-      label: 'Endpunkt Name',
-      hint: 'Bezeichnung des Endorts, z. B. „Gipfelkreuz".',
-      errorMessages: { required: 'Name des Endpunkts ist erforderlich.' },
-    },
-    endLat: {
-      label: 'Breitengrad (Ende)',
-      hint: 'GPS-Breitengrad zwischen –90 und 90.',
-      errorMessages: { required: 'Pflichtfeld.', min: 'Muss ≥ –90 sein.', max: 'Muss ≤ 90 sein.' },
-    },
-    endLon: {
-      label: 'Längengrad (Ende)',
-      hint: 'GPS-Längengrad zwischen –180 und 180.',
-      errorMessages: { required: 'Pflichtfeld.', min: 'Muss ≥ –180 sein.', max: 'Muss ≤ 180 sein.' },
-    },
-    distance: {
-      label: 'Distanz (km)',
-      hint: 'Streckenlänge in Kilometern, muss ≥ 0 sein.',
-      errorMessages: { required: 'Distanz ist erforderlich.', min: 'Muss ≥ 0 sein.' },
-    },
-    durationMin: {
-      label: 'Dauer (Minuten)',
-      hint: 'Geplante Dauer in Minuten, muss ≥ 0 sein.',
-      errorMessages: { required: 'Dauer ist erforderlich.', min: 'Muss ≥ 0 sein.' },
-    },
-  };
 
   get poisArray(): FormArray {
     return this.tourForm.get('pois') as FormArray;
@@ -143,94 +80,180 @@ export class TourFormComponent {
 
   constructor(private fb: FormBuilder) {
     this.tourForm = this.fb.group({
-      title:       ['', [Validators.required, Validators.minLength(2)]],
-      category:    ['hike', Validators.required],
+      title: ['', [Validators.required, Validators.minLength(2)]],
+      category: ['hike', Validators.required],
+      accessible: [false],
       description: [''],
-      image:       [''],
+      image: [''],
       startPoint: this.fb.group({
-        name:      ['', Validators.required],
-        latitude:  [null, [Validators.required, Validators.min(-90),  Validators.max(90)]],
+        name: ['', Validators.required],
+        latitude: [null, [Validators.required, Validators.min(-90), Validators.max(90)]],
         longitude: [null, [Validators.required, Validators.min(-180), Validators.max(180)]],
       }),
       endPoint: this.fb.group({
-        name:      ['', Validators.required],
-        latitude:  [null, [Validators.required, Validators.min(-90),  Validators.max(90)]],
+        name: ['', Validators.required],
+        latitude: [null, [Validators.required, Validators.min(-90), Validators.max(90)]],
         longitude: [null, [Validators.required, Validators.min(-180), Validators.max(180)]],
       }),
       route: this.fb.group({
-        distance:    [null, [Validators.required, Validators.min(0)]],
+        distance: [null, [Validators.required, Validators.min(0)]],
         durationMin: [null, [Validators.required, Validators.min(0)]],
+        routeInfo: [''],
+        geometry: [[]],
       }),
       pois: this.fb.array([]),
     });
 
-    // Populate form when editing a tour
     effect(() => {
       const t = this.tour();
       if (t) {
+        this.hydrating = true;
         this.tourForm.patchValue(t);
         this.poisArray.clear();
-        (t.poi ?? []).forEach(p => this.poisArray.push(this.makePoiGroup(p.name, p.latitude, p.longitude)));
+        (t.poi ?? []).forEach((p) => this.poisArray.push(this.makePoiGroup(p.name, p.latitude, p.longitude)));
+        this.hydrating = false;
         localStorage.removeItem(DRAFT_KEY);
+        this.scheduleRouteCalculation();
       } else {
         const saved = localStorage.getItem(DRAFT_KEY);
         if (saved) {
-          try { this.tourForm.patchValue(JSON.parse(saved)); } catch { /* ignore */ }
+          try {
+            this.tourForm.patchValue(JSON.parse(saved));
+            this.scheduleRouteCalculation();
+          } catch {
+            // ignore invalid draft
+          }
         }
       }
     });
 
-    // Keep _formStatus in sync so errorSummary re-runs on field changes
-    this.tourForm.statusChanges.subscribe(s => this._formStatus.set(s));
-
-    // Auto-save draft for new tours
-    this.tourForm.valueChanges.subscribe(v => {
+    this.tourForm.statusChanges.subscribe((s) => this.formStatus.set(s));
+    this.tourForm.get('category')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
+    this.tourForm.get('accessible')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
+    this.tourForm.get('startPoint')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
+    this.tourForm.get('endPoint')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
+    this.poisArray.valueChanges.subscribe(() => this.scheduleRouteCalculation());
+    this.tourForm.valueChanges.subscribe((v) => {
       if (!this.tour()) localStorage.setItem(DRAFT_KEY, JSON.stringify(v));
+      if (this.tour() && !this.hydrating) this.state.markUnsaved();
     });
   }
 
-  // ── POI management ──
+  openPicker(field: PickerTarget): void {
+    this.activePickerField.set(field);
+  }
+
+  openPoiPicker(index: number): void {
+    this.activePickerField.set(`poi:${index}`);
+  }
+
+  closePicker(): void {
+    this.activePickerField.set(null);
+  }
+
+  applyPickedLocation(loc: { latitude: number; longitude: number; name: string }): void {
+    const field = this.activePickerField();
+    if (!field) return;
+    const path = this.pathForPicker(field);
+    this.tourForm.get(path)?.patchValue(loc);
+    this.tourForm.get(path)?.markAsDirty();
+    this.activePickerField.set(null);
+    this.scheduleRouteCalculation();
+  }
+
+  onLocationNameInput(field: 'start' | 'end' | number, value: string): void {
+    if (this.geocodeTimer) clearTimeout(this.geocodeTimer);
+    if (value.trim().length < 3) {
+      this.setSuggestions(field, []);
+      return;
+    }
+    this.geocodeTimer = setTimeout(() => this.geocodeName(value, field), 700);
+  }
+
+  private async geocodeName(query: string, field: 'start' | 'end' | number): Promise<void> {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&accept-language=de`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Geocoding fehlgeschlagen: ${res.status}`);
+      this.setSuggestions(field, await res.json());
+    } catch {
+      this.setSuggestions(field, []);
+    }
+  }
+
+  applySuggestion(field: 'start' | 'end' | number, result: NominatimResult): void {
+    const path = typeof field === 'number' ? `pois.${field}` : field === 'start' ? 'startPoint' : 'endPoint';
+    this.tourForm.get(path)?.patchValue({
+      name: result.display_name.split(',')[0].trim(),
+      latitude: parseFloat(result.lat),
+      longitude: parseFloat(result.lon),
+    });
+    this.tourForm.get(path)?.markAsDirty();
+    this.setSuggestions(field, []);
+    this.scheduleRouteCalculation();
+  }
+
+  clearSuggestions(field: 'start' | 'end' | number): void {
+    setTimeout(() => this.setSuggestions(field, []), 150);
+  }
+
+  getPickerTitle(): string {
+    const field = this.activePickerField();
+    if (!field) return 'Standort waehlen';
+    if (field === 'start') return 'Startpunkt waehlen';
+    if (field === 'end') return 'Endpunkt waehlen';
+    return 'POI auf Karte waehlen';
+  }
+
+  getPickerInitLat(): number | null {
+    const field = this.activePickerField();
+    if (!field) return null;
+    return this.tourForm.get(`${this.pathForPicker(field)}.latitude`)?.value ?? null;
+  }
+
+  getPickerInitLon(): number | null {
+    const field = this.activePickerField();
+    if (!field) return null;
+    return this.tourForm.get(`${this.pathForPicker(field)}.longitude`)?.value ?? null;
+  }
 
   addPoi(): void {
     this.poisArray.push(this.makePoiGroup('', null, null));
+    this.scheduleRouteCalculation();
   }
 
   removePoi(i: number): void {
     this.poisArray.removeAt(i);
+    this.scheduleRouteCalculation();
   }
 
   private makePoiGroup(name: string, lat: number | null, lon: number | null): FormGroup {
     return this.fb.group({
-      name:      [name, Validators.required],
-      latitude:  [lat,  [Validators.required, Validators.min(-90),  Validators.max(90)]],
-      longitude: [lon,  [Validators.required, Validators.min(-180), Validators.max(180)]],
+      name: [name, Validators.required],
+      latitude: [lat, [Validators.required, Validators.min(-90), Validators.max(90)]],
+      longitude: [lon, [Validators.required, Validators.min(-180), Validators.max(180)]],
     });
   }
 
-  // ── Validation helpers ──
-
   isInvalid(path: string): boolean {
     const ctrl = this.tourForm.get(path);
-    return !!ctrl && ctrl.invalid && (ctrl.touched || this.submitted());
+    return !!ctrl && ctrl.invalid && (ctrl.dirty || ctrl.touched || this.submitted());
   }
 
   isPoiInvalid(i: number, field: string): boolean {
     const ctrl = this.poisArray.at(i)?.get(field);
-    return !!ctrl && ctrl.invalid && (ctrl.touched || this.submitted());
+    return !!ctrl && ctrl.invalid && (ctrl.dirty || ctrl.touched || this.submitted());
   }
 
   getErrors(path: string): string[] {
     const ctrl = this.tourForm.get(path);
     if (!ctrl || ctrl.valid) return [];
     const e = ctrl.errors ?? {};
-    const errorKey = Object.keys(e)[0];
-    const fieldKey = PATH_TO_FIELD[path];
-    const msg = fieldKey ? this.fieldInfos[fieldKey]?.errorMessages[errorKey] : undefined;
-    if (msg) return [msg];
-    if (errorKey === 'required')   return ['Pflichtfeld.'];
-    if (errorKey === 'min')        return [`Muss ≥ ${e['min'].min} sein.`];
-    if (errorKey === 'max')        return [`Muss ≤ ${e['max'].max} sein.`];
-    if (errorKey === 'minlength')  return [`Mindestens ${e['minlength'].requiredLength} Zeichen.`];
+    const key = Object.keys(e)[0];
+    if (key === 'required') return ['Pflichtfeld'];
+    if (key === 'min') return [`Muss >= ${e['min'].min} sein`];
+    if (key === 'max') return [`Muss <= ${e['max'].max} sein`];
+    if (key === 'minlength') return [`Mindestens ${e['minlength'].requiredLength} Zeichen`];
     return [];
   }
 
@@ -238,53 +261,144 @@ export class TourFormComponent {
     const ctrl = this.poisArray.at(i)?.get(field);
     if (!ctrl || ctrl.valid) return [];
     const e = ctrl.errors ?? {};
-    const errorKey = Object.keys(e)[0];
-    if (errorKey === 'required')  return ['Pflichtfeld.'];
-    if (errorKey === 'min')       return [`Muss ≥ ${e['min'].min} sein.`];
-    if (errorKey === 'max')       return [`Muss ≤ ${e['max'].max} sein.`];
+    const key = Object.keys(e)[0];
+    if (key === 'required') return ['Pflichtfeld'];
+    if (key === 'min') return [`Muss >= ${e['min'].min} sein`];
+    if (key === 'max') return [`Muss <= ${e['max'].max} sein`];
     return [];
   }
 
-  toggleInfo(field: string): void {
-    this.openInfo.update(v => v === field ? null : field);
-  }
-
-  // ── Submit ──
-
-  submit(): void {
+  async submit(): Promise<boolean> {
+    if (this.saving()) return false;
     this.submitted.set(true);
-    if (this.tourForm.invalid) return;
+    this.saveError.set(null);
+    await this.calculateRoute();
+    if (this.tourForm.invalid) return false;
 
-    const v = this.tourForm.value;
+    const v = this.tourForm.getRawValue();
     const existing = this.tour();
 
-    if (existing) {
-      this.state.updateTour({
-        ...existing,
-        ...v,
-        poi: v.pois ?? [],
-      });
-    } else {
-      this.state.addTour({
-        id: crypto.randomUUID(),
-        username: this.auth.activeSession().username,
-        title: v.title,
-        category: v.category,
-        description: v.description,
-        image: v.image || 'tba',
-        startPoint: v.startPoint,
-        endPoint: v.endPoint,
-        poi: v.pois ?? [],
-        route: v.route,
-        logs: [],
-      });
-      localStorage.removeItem(DRAFT_KEY);
+    this.saving.set(true);
+    try {
+      if (existing) {
+        await this.state.updateTour({ ...existing, ...v, poi: v.pois ?? [] });
+        this.state.endEditing();
+      } else {
+        await this.state.addTour({
+          id: crypto.randomUUID(),
+          username: this.auth.activeSession().username,
+          title: v.title,
+          category: v.category,
+          accessible: !!v.accessible,
+          favorite: false,
+          description: v.description,
+          image: v.image || 'tba',
+          startPoint: v.startPoint,
+          endPoint: v.endPoint,
+          poi: v.pois ?? [],
+          route: v.route,
+          logs: [],
+        });
+        localStorage.removeItem(DRAFT_KEY);
+      }
+      this.cancelled.emit();
+      return true;
+    } catch {
+      this.saveError.set('Tour konnte nicht gespeichert werden. Bitte Backend und Datenbank pruefen.');
+      return false;
+    } finally {
+      this.saving.set(false);
     }
-    this.cancelled.emit();
   }
 
   cancel(): void {
+    if (this.saving()) return;
     this.cancelled.emit();
+    if (this.tour()) this.state.endEditing();
     if (!this.tour()) this.state.closeAddForm();
+  }
+
+  private setSuggestions(field: 'start' | 'end' | number, results: NominatimResult[]): void {
+    if (field === 'start') this.startSuggestions.set(results);
+    else if (field === 'end') this.endSuggestions.set(results);
+    else this.poiSuggestions.set(results.length > 0 ? { index: field, results } : null);
+  }
+
+  private pathForPicker(field: PickerTarget): string {
+    if (field === 'start') return 'startPoint';
+    if (field === 'end') return 'endPoint';
+    return `pois.${Number(field.split(':')[1])}`;
+  }
+
+  private scheduleRouteCalculation(): void {
+    if (this.routeTimer) clearTimeout(this.routeTimer);
+    this.routeTimer = setTimeout(() => void this.calculateRoute(), 350);
+  }
+
+  private async calculateRoute(): Promise<void> {
+    const start = this.tourForm.get('startPoint')?.value;
+    const end = this.tourForm.get('endPoint')?.value;
+    if (!isValidCoord(start) || !isValidCoord(end)) {
+      this.routeStatus.set('Start und Ziel waehlen, dann wird die Route berechnet.');
+      return;
+    }
+
+    const poiPoints = this.poisArray.controls
+      .map((group) => group.getRawValue())
+      .filter((poi) => isValidCoord(poi));
+    const routePoints: RoutePoint[] = [start, ...poiPoints, end];
+
+    this.routeStatus.set('Route wird berechnet...');
+    const category = this.tourForm.get('category')?.value ?? 'hike';
+    const accessible = !!this.tourForm.get('accessible')?.value;
+    const route = await fetchOsrmRoute(routePoints, category, accessible);
+    const distanceKm = route
+      ? Math.round(route.distanceM / 10) / 100
+      : this.haversinePathKm(routePoints);
+    const durationMin = calcDurationMin(distanceKm, category, accessible ? -1 : 0);
+
+    this.tourForm.get('route')?.patchValue({
+      distance: distanceKm,
+      durationMin,
+      routeInfo: route ? `${route.profile}${accessible ? ' barrierefrei' : ''}` : 'Luftlinie-Schaetzung',
+      geometry: route?.latLngs ?? routePoints.map((point) => [point.latitude, point.longitude]),
+    }, { emitEvent: false });
+    this.tourForm.get('route.distance')?.markAsDirty();
+    this.tourForm.get('route.durationMin')?.markAsDirty();
+
+    this.routeStatus.set(
+      route
+        ? `Route automatisch fuer ${this.transportLabel(category, accessible)} berechnet${poiPoints.length ? `, mit ${poiPoints.length} Zwischenstopp${poiPoints.length > 1 ? 's' : ''}` : ''}.`
+        : 'Route per Luftlinie geschaetzt, Routing-API nicht erreichbar.',
+    );
+  }
+
+  private transportLabel(value: string, accessible: boolean): string {
+    const label = value === 'bike' ? 'Rad' : value === 'run' ? 'Laufen' : 'Wandern';
+    return accessible ? `${label} barrierefrei` : label;
+  }
+
+  private haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const toRad = (value: number) => value * Math.PI / 180;
+    const radiusKm = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return Math.round(radiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 100) / 100;
+  }
+
+  private haversinePathKm(points: RoutePoint[]): number {
+    let distance = 0;
+    for (let i = 1; i < points.length; i++) {
+      distance += this.haversineKm(
+        points[i - 1].latitude,
+        points[i - 1].longitude,
+        points[i].latitude,
+        points[i].longitude,
+      );
+    }
+    return Math.round(distance * 100) / 100;
   }
 }

@@ -48,6 +48,24 @@
 .card-icon.category-run  { background: #fff3cd; }
 .card-icon.category-bike { background: #dbeafe; }
 
+.card-badges {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.favorite-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
 .card-tag {
   padding: 0.15rem 0.55rem;
   border-radius: 999px;

@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
-import { TourStateService } from '../state/tour-state.service';
+import { TourViewModelService } from '../view-model/tour-view-model.service';
 import { TourCardComponent } from '../tour-card/tour-card';
 import { Tour } from '../models/tour.model';
 
@@ -13,7 +13,7 @@ import { Tour } from '../models/tour.model';
 export class TourListComponent implements OnInit, OnDestroy {
   @ViewChild('sentinel', { static: true }) sentinel!: ElementRef<HTMLDivElement>;
 
-  protected readonly state = inject(TourStateService);
+  protected readonly state = inject(TourViewModelService);
 
   readonly tours      = this.state.visibleTours;
   readonly selectedId = this.state.selectedTourId;

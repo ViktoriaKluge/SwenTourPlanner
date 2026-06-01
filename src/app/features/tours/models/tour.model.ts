@@ -5,6 +5,8 @@ export type Tour = {
   username: string;
   title: string;
   category: Category;
+  accessible: boolean;
+  favorite: boolean;
   description: string;
   startPoint: Location;
   endPoint: Location;
@@ -12,6 +14,8 @@ export type Tour = {
   image: string;
   route: Route;
   logs: TourLog[];
+  popularity?: number;
+  childFriendliness?: string;
 };
 
 export type Location = {
@@ -23,6 +27,8 @@ export type Location = {
 export type Route = {
   distance: number;
   durationMin: number;
+  routeInfo?: string;
+  geometry?: [number, number][];
 };
 
 export type TourLog = {
@@ -30,5 +36,25 @@ export type TourLog = {
   date: Date;
   comment: string;
   difficulty: number;
+  totalDistance: number;
+  totalTime: number;
   rating: number;
+};
+
+export type Weather = {
+  providerConfigured: boolean;
+  coverageLabel?: string;
+  locationName?: string;
+  description?: string;
+  temperatureCelsius?: number;
+  temperatureMinCelsius?: number;
+  temperatureMaxCelsius?: number;
+  feelsLikeCelsius?: number;
+  feelsLikeMinCelsius?: number;
+  feelsLikeMaxCelsius?: number;
+  humidity?: number;
+  windKmh?: number;
+  sampleCount?: number;
+  clothingAdvice: string;
+  message?: string;
 };

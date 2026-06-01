@@ -4,7 +4,6 @@
     @if (editing()) {
       <app-tour-form [tour]="selected()" (cancelled)="cancelEdit()" />
     } @else {
-      <!-- Header -->
       <div class="detail-header">
         <div>
           <h2 class="detail-title">{{ selected()!.title }}</h2>
@@ -12,14 +11,24 @@
             {{ selected()!.category }}
           </span>
         </div>
-        <button class="close-btn" type="button" (click)="close()" aria-label="Schließen">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M18 6 6 18M6 6l12 12"/>
-          </svg>
-        </button>
+        <div class="detail-header-actions">
+          <button
+            class="favorite-btn"
+            [class.active]="selected()!.favorite"
+            type="button"
+            (click)="toggleFavorite()"
+            [attr.aria-label]="selected()!.favorite ? 'Aus Favoriten entfernen' : 'Als Favorit markieren'"
+          >
+            {{ selected()!.favorite ? '★' : '☆' }}
+          </button>
+          <button class="close-btn" type="button" (click)="close()" aria-label="Schliessen">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Info rows -->
       @if (selected()!.description) {
         <div class="info-row">
           <span class="info-label">Beschreibung</span>
@@ -29,14 +38,16 @@
 
       <div class="info-grid">
         <div class="info-card">
-          <span class="info-icon">📏</span>
           <span class="info-num">{{ selected()!.route.distance }}</span>
           <span class="info-unit">km</span>
         </div>
         <div class="info-card">
-          <span class="info-icon">⏱</span>
           <span class="info-num">{{ selected()!.route.durationMin }}</span>
           <span class="info-unit">Min.</span>
+        </div>
+        <div class="info-card">
+          <span class="info-num">{{ selected()!.popularity ?? selected()!.logs.length }}</span>
+          <span class="info-unit">Logs</span>
         </div>
       </div>
 
@@ -44,16 +55,49 @@
         <span class="info-label">Startpunkt</span>
         <span class="info-value">
           {{ selected()!.startPoint.name }}
-          <span class="coords">({{ selected()!.startPoint.latitude }}, {{ selected()!.startPoint.longitude }})</span>
         </span>
       </div>
       <div class="info-row">
         <span class="info-label">Endpunkt</span>
         <span class="info-value">
           {{ selected()!.endPoint.name }}
-          <span class="coords">({{ selected()!.endPoint.latitude }}, {{ selected()!.endPoint.longitude }})</span>
         </span>
       </div>
+
+      <section class="weather-card" aria-label="Wetter im Tourgebiet">
+        <div class="weather-header">
+          <span class="info-label">Wettercheck</span>
+          @if (weatherLoading()) {
+            <span class="spinner spinner-dark" aria-hidden="true"></span>
+          }
+        </div>
+
+        @if (weatherError()) {
+          <p class="weather-message">{{ weatherError() }}</p>
+        } @else if (weather()) {
+          @if (!weather()!.providerConfigured) {
+            <p class="weather-message">{{ weather()!.message }}</p>
+          } @else {
+            <div class="weather-grid">
+              <div>
+                <strong>{{ weather()!.temperatureMinCelsius ?? weather()!.temperatureCelsius }}°C bis {{ weather()!.temperatureMaxCelsius ?? weather()!.temperatureCelsius }}°C</strong>
+                <span>{{ weather()!.description }}</span>
+              </div>
+              <div>
+                <strong>{{ weather()!.feelsLikeMinCelsius ?? weather()!.feelsLikeCelsius }}°C bis {{ weather()!.feelsLikeMaxCelsius ?? weather()!.feelsLikeCelsius }}°C</strong>
+                <span>Gefühlt entlang der Tour</span>
+              </div>
+              <div>
+                <strong>{{ weather()!.windKmh }} km/h</strong>
+                <span>Stärkster Wind</span>
+              </div>
+            </div>
+            <p class="clothing-advice">{{ weather()!.clothingAdvice }}</p>
+          }
+        } @else {
+          <p class="weather-message">Wetterdaten werden vorbereitet...</p>
+        }
+      </section>
 
       @if (selected()!.poi.length > 0) {
         <div class="info-row">
@@ -61,26 +105,91 @@
           <div class="poi-list">
             @for (p of selected()!.poi; track p.name) {
               <div class="poi-item">
-                <span class="poi-dot"></span>
                 {{ p.name }}
-                <span class="coords">({{ p.latitude }}, {{ p.longitude }})</span>
               </div>
             }
           </div>
         </div>
       }
 
-      <!-- Map -->
       <app-tour-map
         [startPoint]="selected()!.startPoint"
         [endPoint]="selected()!.endPoint"
         [pois]="selected()!.poi"
+        [routeGeometry]="selected()!.route.geometry ?? []"
       />
 
-      <!-- Actions -->
+      <app-tour-log-list [tourId]="selected()!.id" [logs]="selected()!.logs" />
+
       <div class="detail-actions">
-        <button class="btn-edit" type="button" (click)="startEdit()">✏️ Bearbeiten</button>
-        <button class="btn-delete" type="button" (click)="delete()">🗑 Löschen</button>
+        <button class="btn-edit" type="button" (click)="startEdit()" [disabled]="deleting()">Bearbeiten</button>
+        <button class="btn-delete" type="button" (click)="requestDelete()" [disabled]="deleting()">Loeschen</button>
+      </div>
+
+    }
+
+    @if (confirmDeleteOpen()) {
+      <div class="delete-modal-backdrop" role="presentation" (click)="cancelDelete()">
+        <div class="delete-modal" role="alertdialog" aria-labelledby="delete-title" aria-modal="true" (click)="$event.stopPropagation()">
+          <h3 id="delete-title">Tour wirklich loeschen?</h3>
+          <p>Diese Tour und ihre Logeintraege werden dauerhaft entfernt.</p>
+          @if (deleteError()) {
+            <p class="delete-error">{{ deleteError() }}</p>
+          }
+          <div class="confirm-actions">
+            <button class="btn-keep" type="button" (click)="cancelDelete()" [disabled]="deleting()">Abbrechen</button>
+            <button class="btn-confirm-delete" type="button" (click)="confirmDelete()" [disabled]="deleting()">
+              @if (deleting()) {
+                <span class="spinner" aria-hidden="true"></span>
+                Loesche...
+              } @else {
+                Ja, loeschen
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (state.pendingSelectionId()) {
+      <div class="delete-modal-backdrop" role="presentation" (click)="cancelTourSwitch()">
+        <div class="delete-modal" role="alertdialog" aria-labelledby="switch-title" aria-modal="true" (click)="$event.stopPropagation()">
+          <h3 id="switch-title">Aenderungen speichern?</h3>
+          <p>Du bearbeitest gerade eine Tour. Moechtest du die Aenderungen speichern, bevor du zur anderen Tour wechselst?</p>
+          <div class="confirm-actions">
+            <button class="btn-keep" type="button" (click)="cancelTourSwitch()" [disabled]="savingPendingSelection()">Weiter bearbeiten</button>
+            <button class="btn-keep" type="button" (click)="discardAndSwitch()" [disabled]="savingPendingSelection()">Verwerfen</button>
+            <button class="btn-confirm-delete" type="button" (click)="saveAndSwitch()" [disabled]="savingPendingSelection()">
+              @if (savingPendingSelection()) {
+                <span class="spinner" aria-hidden="true"></span>
+                Speichere...
+              } @else {
+                Speichern
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (state.pendingAddForm()) {
+      <div class="delete-modal-backdrop" role="presentation" (click)="cancelAddSwitch()">
+        <div class="delete-modal" role="alertdialog" aria-labelledby="add-title" aria-modal="true" (click)="$event.stopPropagation()">
+          <h3 id="add-title">Aenderungen speichern?</h3>
+          <p>Du bearbeitest gerade eine Tour. Moechtest du die Aenderungen speichern, bevor du eine neue Tour anlegst?</p>
+          <div class="confirm-actions">
+            <button class="btn-keep" type="button" (click)="cancelAddSwitch()" [disabled]="savingPendingSelection()">Weiter bearbeiten</button>
+            <button class="btn-keep" type="button" (click)="discardAndAdd()" [disabled]="savingPendingSelection()">Verwerfen</button>
+            <button class="btn-confirm-delete" type="button" (click)="saveAndAdd()" [disabled]="savingPendingSelection()">
+              @if (savingPendingSelection()) {
+                <span class="spinner" aria-hidden="true"></span>
+                Speichere...
+              } @else {
+                Speichern
+              }
+            </button>
+          </div>
+        </div>
       </div>
     }
   </div>

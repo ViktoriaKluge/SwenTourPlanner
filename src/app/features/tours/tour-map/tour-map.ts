@@ -34,6 +34,7 @@ export class TourMapComponent implements AfterViewInit, OnDestroy {
   readonly startPoint = input<Location | null>(null);
   readonly endPoint   = input<Location | null>(null);
   readonly pois       = input<Location[]>([]);
+  readonly routeGeometry = input<[number, number][]>([]);
 
   @ViewChild('mapEl', { static: true }) mapEl!: ElementRef<HTMLDivElement>;
 
@@ -46,7 +47,8 @@ export class TourMapComponent implements AfterViewInit, OnDestroy {
       const start = this.startPoint();
       const end   = this.endPoint();
       const pois  = this.pois();
-      if (this.map) this.render(start, end, pois);
+      const routeGeometry = this.routeGeometry();
+      if (this.map) this.render(start, end, pois, routeGeometry);
     });
   }
 
@@ -59,7 +61,7 @@ export class TourMapComponent implements AfterViewInit, OnDestroy {
     }).addTo(this.map);
 
     this.markersGroup = L.layerGroup().addTo(this.map);
-    this.render(this.startPoint(), this.endPoint(), this.pois());
+    this.render(this.startPoint(), this.endPoint(), this.pois(), this.routeGeometry());
   }
 
   ngOnDestroy(): void {
@@ -67,9 +69,15 @@ export class TourMapComponent implements AfterViewInit, OnDestroy {
     this.map = null;
   }
 
-  private render(start: Location | null, end: Location | null, pois: Location[]): void {
+  private render(
+    start: Location | null,
+    end: Location | null,
+    pois: Location[],
+    routeGeometry: [number, number][],
+  ): void {
     this.markersGroup?.clearLayers();
     const points: L.LatLng[] = [];
+    const routePoints = this.toLatLngs(routeGeometry, start, end);
 
     if (this.isValid(start)) {
       const ll = L.latLng(start.latitude, start.longitude);
@@ -97,10 +105,16 @@ export class TourMapComponent implements AfterViewInit, OnDestroy {
       }
     }
 
-    if (points.length >= 2) {
+    if (routePoints.length >= 2) {
+      L.polyline(routePoints, { color: '#667eea', weight: 4, opacity: 0.85 })
+        .addTo(this.markersGroup!);
+      this.map?.fitBounds(L.latLngBounds([...routePoints, ...points]), { padding: [40, 40] });
+      setTimeout(() => this.map?.invalidateSize(), 0);
+    } else if (points.length >= 2) {
       L.polyline(points, { color: '#667eea', weight: 3, opacity: 0.7, dashArray: '6 4' })
         .addTo(this.markersGroup!);
       this.map?.fitBounds(L.latLngBounds(points), { padding: [40, 40] });
+      setTimeout(() => this.map?.invalidateSize(), 0);
     } else if (points.length === 1) {
       this.map?.setView(points[0], 13);
     } else {
@@ -114,6 +128,49 @@ export class TourMapComponent implements AfterViewInit, OnDestroy {
       !!loc &&
       loc.latitude  >= -90  && loc.latitude  <= 90 &&
       loc.longitude >= -180 && loc.longitude <= 180
+    );
+  }
+
+  private toLatLngs(
+    geometry: [number, number][] | null | undefined,
+    start: Location | null,
+    end: Location | null,
+  ): L.LatLng[] {
+    const raw = geometry ?? [];
+    const asLatLng = raw.map(([lat, lon]) => L.latLng(lat, lon)).filter((p) => this.isFiniteLatLng(p));
+    const asLonLat = raw.map(([lon, lat]) => L.latLng(lat, lon)).filter((p) => this.isFiniteLatLng(p));
+
+    if (this.isValid(start) && this.isValid(end) && asLatLng.length === asLonLat.length) {
+      return this.geometryScore(asLatLng, start, end) <= this.geometryScore(asLonLat, start, end)
+        ? asLatLng
+        : asLonLat;
+    }
+
+    return asLatLng.length >= asLonLat.length ? asLatLng : asLonLat;
+  }
+
+  private geometryScore(points: L.LatLng[], start: Location, end: Location): number {
+    if (points.length === 0) return Number.POSITIVE_INFINITY;
+    const first = points[0];
+    const last = points[points.length - 1];
+    return (
+      this.distanceScore(first, start) +
+      this.distanceScore(last, end)
+    );
+  }
+
+  private distanceScore(point: L.LatLng, loc: Location): number {
+    return Math.abs(point.lat - loc.latitude) + Math.abs(point.lng - loc.longitude);
+  }
+
+  private isFiniteLatLng(point: L.LatLng): boolean {
+    return (
+      Number.isFinite(point.lat) &&
+      Number.isFinite(point.lng) &&
+      point.lat >= -90 &&
+      point.lat <= 90 &&
+      point.lng >= -180 &&
+      point.lng <= 180
     );
   }
 }
