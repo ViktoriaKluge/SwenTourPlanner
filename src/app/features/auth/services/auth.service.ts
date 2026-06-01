@@ -1,15 +1,25 @@
-import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { Section, Session } from '../../../core/models/session.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+
   readonly activeSession = signal<Session>({
     loggedIn: false,
     username: '',
     sections: ['home'],
   });
 
-  login(username: string): void {
+  async login(username: string, password: string): Promise<void> {
+    await firstValueFrom(this.http.post('/api/auth/login', { username, password }));
+    this.activeSession.set({ loggedIn: true, username, sections: ['home'] });
+  }
+
+  async register(username: string, password: string): Promise<void> {
+    await firstValueFrom(this.http.post('/api/auth/register', { username, password }));
     this.activeSession.set({ loggedIn: true, username, sections: ['home'] });
   }
 

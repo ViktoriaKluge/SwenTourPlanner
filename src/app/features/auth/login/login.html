@@ -1,6 +1,6 @@
 <div class="content-container">
   <form class="login-form" [formGroup]="loginForm" (ngSubmit)="login()">
-    <h2>Login</h2>
+    <h2>{{ registerMode ? 'Registrieren' : 'Login' }}</h2>
 
     <div class="form-group">
       <label for="username">Username</label>
@@ -9,6 +9,7 @@
         id="username"
         formControlName="username"
         placeholder="Dein Username"
+        [disabled]="busy()"
         required
       />
 
@@ -21,14 +22,28 @@
         id="password"
         formControlName="password"
         placeholder="Dein Passwort"
+        [disabled]="busy()"
         required
       />
     </div>
 
-    <button type="submit" class="login-btn">Anmelden</button>
+    @if (error) {
+      <p class="form-error">{{ error }}</p>
+    }
+
+    <button type="submit" class="login-btn" [disabled]="busy()">
+      @if (busy()) {
+        <span class="spinner" aria-hidden="true"></span>
+        {{ registerMode ? 'Account wird erstellt...' : 'Anmeldung läuft...' }}
+      } @else {
+        {{ registerMode ? 'Account erstellen' : 'Anmelden' }}
+      }
+    </button>
 
     <p class="forgot-password">
-      <a href="#">Passwort vergessen?</a>
+      <a href="#" [class.disabled-link]="busy()" (click)="$event.preventDefault(); toggleMode()">
+        {{ registerMode ? 'Schon registriert? Zum Login' : 'Noch kein Account? Registrieren' }}
+      </a>
     </p>
 
   </form>
