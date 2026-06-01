@@ -1,59 +1,100 @@
-# TourPlanner
+# SWEN Tour Planner
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.2.
+Two-tier Tour Planner implementation for the semester project:
 
-## Development server
+- Angular frontend with MVVM-style feature/state/services split
+- Spring Boot backend with controller, service/business, and repository/data-access layers
+- PostgreSQL persistence via Spring Data JPA/Hibernate
+- REST/JSON communication between frontend and backend
+- OpenRouteService integration for route distance/time enrichment
+- Leaflet map display in the frontend
+- Import/export of tour data as JSON
+- Unit tests for full-text search and computed tour attributes
 
-To start a local development server, run:
+## Prerequisites
 
-```bash
-ng serve
+- Node.js and npm
+- Java 8
+- Maven
+- Docker for PostgreSQL (optional)
+
+## Configuration
+
+Backend configuration is kept outside source code through environment variables. Defaults are provided for local development:
+
+\backend\src\main\resources\application.yml
+
+```powershell
+\backend\src\main\resources\application.yml
+
+$env:DB_URL="jdbc:postgresql://localhost:5432/tourplanner"
+$env:DB_USER="tourplanner"
+$env:DB_PASSWORD="tourplanner"
+$env:TOUR_IMAGE_DIR="./data/images"
+$env:ORS_API_KEY="<your-openrouteservice-key>"
+$env:OPENWEATHER_API_KEY="<your-openweather-key>"
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Start PostgreSQL:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+docker compose up -d
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Run
 
-```bash
-ng generate --help
+Start the backend:
+
+```powershell
+npm run backend
 ```
 
-## Building
+Start the Angular frontend with the API proxy:
 
-To build the project run:
-
-```bash
-ng build
+```powershell
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Open `http://localhost:4200`.
 
-## Running unit tests
+## Tests
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Frontend:
 
-```bash
-ng test
+```powershell
+npm test
 ```
 
-## Running end-to-end tests
+Backend:
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```powershell
+mvn -f backend/pom.xml test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Architecture Notes
 
-## Additional Resources
+The backend follows a layer-based architecture:
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- Presentation layer: `backend/src/main/java/at/fhtw/tourplanner/controller`
+- Business layer: `backend/src/main/java/at/fhtw/tourplanner/service`
+- Data access layer: `backend/src/main/java/at/fhtw/tourplanner/repo`
+- Domain model: `backend/src/main/java/at/fhtw/tourplanner/model`
+- DTO boundary: `backend/src/main/java/at/fhtw/tourplanner/dto`
+
+The Angular frontend follows an MVVM-oriented feature layout:
+
+- Views/components: `src/app/features/**`
+- ViewModels: `src/app/features/*/view-model`
+- Data access services: `src/app/features/*/data-access`
+- Shared feature models: `src/app/features/*/models`
+
+Design patterns used:
+
+- Repository pattern through Spring Data repositories
+- DTO/Mapper pattern for REST serialization boundaries
+- Service layer pattern for business logic such as search and computed attributes
+
+Additional project documentation:
+
+- `API.md`: REST endpoints and frontend/backend links
+- `UnitTests.md`: JUnit unit test catalogue and rationale
