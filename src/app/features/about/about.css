@@ -1,10 +1,74 @@
-
-.about {
-  max-width: 600px;
-  border-radius: 8px;
-  padding: 1.25rem 1.5rem;
+.about-page {
+  width: min(920px, calc(100% - 2rem));
+  margin: 1.5rem auto;
 }
 
-.about h2 {
-  margin-top: 0;
+.about-panel {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #1f2937;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: #667eea;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+
+.about-panel h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.15;
+}
+
+.about-panel p {
+  margin: 0 0 0.9rem;
+  color: #475569;
+  line-height: 1.65;
+}
+
+.creator-box {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border-radius: 10px;
+  background: #eef0fd;
+  padding: 0.9rem 1rem;
+}
+
+.creator-box span {
+  color: #64748b;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+}
+
+.creator-box strong {
+  color: #2d3748;
+}
+
+:host-context(.dark-mode) .about-panel {
+  background: #111827;
+  border-color: #253044;
+  color: #e5e7eb;
+}
+
+:host-context(.dark-mode) .about-panel p {
+  color: #cbd5e1;
+}
+
+:host-context(.dark-mode) .creator-box {
+  background: rgba(129, 140, 248, 0.18);
+}
+
+:host-context(.dark-mode) .creator-box strong {
+  color: #f8fafc;
 }

@@ -19,3 +19,17 @@
   color: #64748b;
   font-size: 1rem;
 }
+
+:host-context(.dark-mode) .shell-main {
+  background: #0f172a;
+}
+
+:host-context(.dark-mode) .not-logged-in {
+  color: #cbd5e1;
+}
+
+@media (max-width: 767px) {
+  .shell-main {
+    min-height: calc(100vh - 72px);
+  }
+}

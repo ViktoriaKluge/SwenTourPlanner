@@ -7,25 +7,50 @@
     }
   </div>
 
-  <nav class="nav">
-    <span (click)="goTo('home')" class="clickable-text">
+  <nav class="nav" aria-label="Hauptnavigation">
+    <button type="button" (click)="goTo('home')" class="nav-item">
+      <span class="nav-icon">H</span>
       Home
-    </span>
+    </button>
 
-    <span (click)="goTo('about')" class="clickable-text">
-      About
-    </span>
+    <button type="button" (click)="goToTours()" class="nav-item mobile-nav-item">
+      <span class="nav-icon">T</span>
+      Touren
+    </button>
 
-    @if (!this.session().loggedIn) {
-      <span (click)="goTo('login')" class="clickable-text">
-        Login
-    </span>
-    } @else {
-      <span (click)="logout()" class="clickable-text">
-        Logout
-    </span>
-    }
+    <button type="button" (click)="goToFavorites()" class="nav-item mobile-nav-item">
+      <span class="nav-icon">★</span>
+      Favoriten
+    </button>
 
+    <div class="more-menu" (click)="$event.stopPropagation()">
+      <button type="button" class="nav-item nav-item--more" (click)="toggleMoreMenu($event)" [attr.aria-expanded]="moreOpen()" aria-haspopup="menu">
+        <span class="nav-icon">...</span>
+        Mehr
+      </button>
+
+      @if (moreOpen()) {
+        <div class="more-dropdown" role="menu">
+          <button class="more-action" type="button" role="menuitem" (click)="goTo('about')">About</button>
+
+          @if (this.session().loggedIn) {
+            <a class="more-action" [href]="exportUrl()" role="menuitem" (click)="closeMoreMenu()">Export</a>
+            <label class="more-action more-action--file" role="menuitem">
+              <input type="file" accept="application/json" hidden (change)="importFile($event)" />
+              Import
+            </label>
+            <button class="more-action" type="button" role="menuitem" (click)="logout()">Logout</button>
+          } @else {
+            <button class="more-action" type="button" role="menuitem" (click)="goTo('login')">Login</button>
+          }
+
+          <label class="more-toggle" title="Darkmode" role="menuitemcheckbox" [attr.aria-checked]="darkMode()">
+            <span>Darkmode</span>
+            <input type="checkbox" [checked]="darkMode()" (change)="toggleDarkMode()" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </div>
+      }
+    </div>
   </nav>
 </header>
-

@@ -1,1 +1,90 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #f8fafc;
+  color: #1f2937;
+}
+
+body.dark-mode {
+  color-scheme: dark;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+body.dark-mode .content,
+body.dark-mode .shell-main,
+body.dark-mode .tours-page {
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+body.dark-mode .tour-form,
+body.dark-mode .login-form,
+body.dark-mode .detail-card,
+body.dark-mode .tour-card,
+body.dark-mode .filter-box,
+body.dark-mode .search-input,
+body.dark-mode .field-group input,
+body.dark-mode .field-group select,
+body.dark-mode .field-group textarea,
+body.dark-mode .log-list,
+body.dark-mode .log-entry {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+  border-color: #253044 !important;
+}
+
+body.dark-mode .field-group label,
+body.dark-mode .login-form h2,
+body.dark-mode .form-header h2,
+body.dark-mode .filter-label,
+body.dark-mode .log-list-title,
+body.dark-mode .log-comment {
+  color: #e5e7eb !important;
+}
+
+body.dark-mode .coord-pill,
+body.dark-mode .accessibility-toggle,
+body.dark-mode .computed-field,
+body.dark-mode .info-card,
+body.dark-mode .poi-entry,
+body.dark-mode .page-loading {
+  background: #1f2937 !important;
+  color: #cbd5e1 !important;
+}
+
+body.dark-mode .accessibility-toggle small,
+body.dark-mode .computed-label,
+body.dark-mode .computed-unit {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .accessibility-toggle strong,
+body.dark-mode .computed-field strong {
+  color: #f8fafc !important;
+}
+
+body.dark-mode .accessibility-toggle:has(input:checked) {
+  background: #1f2937 !important;
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.16);
+}
+
+body.dark-mode .add-tour-wrapper,
+body.dark-mode .content-container {
+  background: linear-gradient(135deg, #111827 0%, #312e81 100%);
+}
+
+body.dark-mode a {
+  color: #a5b4fc;
+}
+
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 72px;
+  }
+}

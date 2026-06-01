@@ -5,7 +5,7 @@ import { AboutComponent } from '../../features/about/about';
 import { LoginComponent } from '../../features/auth/login/login';
 import { ToursPageComponent } from '../../features/tours/tours-page/tours-page';
 import { TourFormComponent } from '../../features/tours/tour-form/tour-form';
-import { TourStateService } from '../../features/tours/state/tour-state.service';
+import { TourViewModelService } from '../../features/tours/view-model/tour-view-model.service';
 
 @Component({
   selector: 'app-shell',
@@ -16,7 +16,7 @@ import { TourStateService } from '../../features/tours/state/tour-state.service'
 })
 export class ShellComponent {
   private readonly auth  = inject(AuthService);
-  protected readonly tourState = inject(TourStateService);
+  protected readonly tourState = inject(TourViewModelService);
 
   readonly session      = this.auth.activeSession;
   readonly isAddingTour = this.tourState.isAddingTour;

@@ -6,8 +6,9 @@
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid #e0e0e0;
   background: #ffffff;
-  position: relative;  /* Oder fixed */
+  position: relative;
   z-index: 1000;
+  color: #1f2937;
 }
 
 .logo {
@@ -37,14 +38,265 @@
 
 .nav {
   display: flex;
-  gap: 1.25rem;
+  align-items: center;
+  gap: 0.65rem;
 }
 
-.clickable-text {
+.mobile-nav-item {
+  display: none;
+}
+
+.more-menu {
+  position: relative;
+}
+
+.clickable-text,
+.nav-item {
   cursor: pointer;
   pointer-events: auto;
 }
 
-.clickable-text:hover {
+.clickable-text:hover,
+.nav-item:hover {
   color: #764ba2;
+}
+
+.nav-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+}
+
+.nav-item:hover {
+  background: #f5f7ff;
+}
+
+.nav-icon {
+  display: none;
+  font-weight: 800;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.more-dropdown {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  min-width: 180px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.more-action,
+.more-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #334155;
+  text-decoration: none;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+}
+
+button.more-action {
+  text-align: left;
+}
+
+.more-action:hover,
+.more-toggle:hover {
+  background: #f5f7ff;
+}
+
+.more-action--file input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-toggle input,
+.more-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-track {
+  width: 46px;
+  height: 24px;
+  border-radius: 999px;
+  background: #cbd5e1;
+  padding: 3px;
+  transition: background 0.2s;
+}
+
+.toggle-thumb {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+  transition: transform 0.2s;
+}
+
+.theme-toggle input:checked + .toggle-track,
+.more-toggle input:checked + .toggle-track {
+  background: #667eea;
+}
+
+.theme-toggle input:checked + .toggle-track .toggle-thumb,
+.more-toggle input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(22px);
+}
+
+:host-context(.dark-mode) .header {
+  background: #111827;
+  border-bottom-color: #253044;
+  color: #e5e7eb;
+}
+
+:host-context(.dark-mode) .logo-mark {
+  background: #818cf8;
+  color: #111827;
+}
+
+:host-context(.dark-mode) .nav-item:hover {
+  background: #1f2937;
+}
+
+:host-context(.dark-mode) .theme-toggle {
+  color: #cbd5e1;
+}
+
+:host-context(.dark-mode) .more-dropdown {
+  background: #111827;
+  border-color: #253044;
+}
+
+:host-context(.dark-mode) .more-action,
+:host-context(.dark-mode) .more-toggle {
+  color: #e5e7eb;
+}
+
+:host-context(.dark-mode) .more-action:hover,
+:host-context(.dark-mode) .more-toggle:hover {
+  background: #1f2937;
+}
+
+@media (max-width: 767px) {
+  .header {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    justify-content: center;
+    padding: 0.45rem 0.75rem calc(0.45rem + env(safe-area-inset-bottom));
+    border-top: 1px solid #e0e0e0;
+    border-bottom: none;
+  }
+
+  .logo {
+    display: none;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: space-around;
+    gap: 0.25rem;
+  }
+
+  .mobile-nav-item {
+    display: inline-flex;
+  }
+
+  .nav-item {
+    flex: 1;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.35rem 0.2rem;
+    font-size: 0.68rem;
+    min-width: 0;
+  }
+
+  .nav-icon {
+    display: block;
+    font-size: 0.95rem;
+    line-height: 1;
+  }
+
+  .theme-toggle {
+    flex: 1;
+    flex-direction: column;
+    gap: 0.18rem;
+    font-size: 0.72rem;
+  }
+
+  .more-menu {
+    flex: 1;
+  }
+
+  .nav-item--more {
+    flex: 1;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.35rem 0.2rem;
+    font-size: 0.68rem;
+  }
+
+  .more-dropdown {
+    right: 0.25rem;
+    bottom: calc(100% + 0.5rem);
+    top: auto;
+    min-width: 190px;
+  }
+
+  .toggle-track {
+    width: 38px;
+    height: 21px;
+  }
+
+  .toggle-thumb {
+    width: 15px;
+    height: 15px;
+  }
+
+  .theme-toggle input:checked + .toggle-track .toggle-thumb,
+  .more-toggle input:checked + .toggle-track .toggle-thumb {
+    transform: translateX(17px);
+  }
+
+  :host-context(.dark-mode) .header {
+    border-top-color: #253044;
+  }
 }
