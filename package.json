@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "backend": "mvn -f backend/pom.xml spring-boot:run",
+    "backend": "cd backend && mvn spring-boot:run",
     "dev": "npm run start"
   },
   "private": true,

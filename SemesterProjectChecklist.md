@@ -33,3 +33,33 @@ Checked against `semester-project.pdf`.
 | Wireframes/UML/protocol PDF | Not in scope | Required by hand-in PDF; create or verify external protocol document before final submission. |
 | Time tracking | Not in scope | Required by hand-in PDF; maintain in protocol. |
 
+---
+
+## Noch genauer anschauen
+
+### Unit Tests
+- Aktuelle Tests (`TourStatsAndSearchTest.java`) decken nur Stats und Suche ab – prüfen ob weitere Bereiche gefordert sind (z.B. Controller, Mapper, Auth)
+- Testen ob alle Tests noch grün sind nach den letzten Änderungen (`TourService.addLog` fix)
+- Testabdeckung realistisch einschätzen: reicht das für die Anforderung?
+
+### Architektur / Weg (Begründung für den Lektor)
+- Doppeltes Routing (OSRM im Frontend + ORS im Backend) erklären/begründen – z.B. als Fallback-Design dokumentieren
+- Warum `.env` manuell in `TourPlannerApplication` geladen wird (kein dotenv-Library-Support für Spring Boot 2.7)
+- Frontend ruft Nominatim und OSRM direkt aus dem Browser auf – bewusste Entscheidung oder Optimierungspotential?
+
+### Was ist gefordert (Double Check)
+- `semester-project.pdf` nochmals komplett durchlesen und mit dieser Checkliste abgleichen
+- Besonders: Wireframes, UML-Diagramme, Protokoll, Zeitaufzeichnung – sind diese Dokumente vollständig?
+- Image-Upload/-Storage: aktuell nur Pfad-Konzept dokumentiert – läuft das auch wirklich im Live-Betrieb durch?
+- Geforderte Designmuster nochmals prüfen: Repository, MVVM, DTO/Mapper – gibt es noch weitere die erwartet werden?
+
+### Optimierungsoptionen
+- **Routing:** Nur eine Routing-Quelle statt zwei (OSRM Frontend + ORS Backend) – sauberer, weniger Fehlerquellen
+- **ORS API Key:** ✓ Neuer Key eingetragen, funktioniert (kein 403 mehr im Backend-Log)
+- **Fehlerbehandlung im Frontend:** Generische Fehlermeldung „Bitte Backend und Datenbank prüfen" könnte spezifischer sein
+- **`locationToDto` / `locationFromDto`** in `TourMapper`: kein Null-Check – könnte bei ungültigen Daten crashen
+- **Geometrie-Vereinfachung:** OSRM liefert sehr viele Koordinatenpunkte; für lange Routen könnte man die Geometrie vor dem Speichern vereinfachen (Douglas-Peucker o.ä.)
+- **Zeitberechnung prüfen:** Wie wird die Tour-Dauer berechnet? (`calcDurationMin` in `routing.ts` verwendet fixe Durchschnittsgeschwindigkeiten je Kategorie) – ist das realistisch/ausreichend oder wird eine genauere Berechnung erwartet?
+- **Nach Tour-Erstellung automatisch auswählen:** Neue Tour wird nach dem Speichern nicht automatisch im Frontend selektiert – Nutzer muss sie manuell anklicken; wäre bessere UX
+- **Routing-API prüfen:** Ist im Semester-Projekt eine bestimmte API vorgeschrieben (z.B. OpenRouteService)? Aktuell nutzt das Frontend OSRM und das Backend ORS – falls ORS vorgegeben ist, sollte das Frontend ebenfalls nur ORS verwenden (über das Backend), nicht OSRM direkt.
+

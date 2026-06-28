@@ -9,7 +9,7 @@ public class RouteEmbeddable {
   private int durationMin;
   @Column(length = 2000)
   private String routeInfo;
-  @Column(length = 10000)
+  @Column(columnDefinition = "TEXT")
   private String geometryJson;
 
   public double getDistance() { return distance; }

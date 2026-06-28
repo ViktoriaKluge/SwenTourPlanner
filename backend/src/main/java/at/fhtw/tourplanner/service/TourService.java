@@ -81,7 +81,6 @@ public class TourService {
   public TourLogDto addLog(String username, String tourId, TourLogDto dto) {
     TourEntity tour = findTour(username, tourId);
     TourLogEntity log = mapper.applyLog(dto, new TourLogEntity(), tour);
-    tour.getLogs().add(log);
     return mapper.logToDto(logs.save(log));
   }
 
