@@ -17,10 +17,10 @@ spring:
 app:
   upload-dir: ${TOUR_IMAGE_DIR:./data/images}
   open-route-service:
-    api-key: ${ORS_API_KEY:eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjI0YmJiYzcxNTIxODRkMjRhODcwY2FiNjU0NjJkOTdlIiwiaCI6Im11cm11cjY0In0=}
+    api-key: ${ORS_API_KEY}
     base-url: ${ORS_BASE_URL:https://api.openrouteservice.org}
   open-weather:
-    api-key: ${OPENWEATHER_API_KEY:41f13ab9a19f66502d48da02b7e8b1cd}
+    api-key: ${OPENWEATHER_API_KEY}
     base-url: ${OPENWEATHER_BASE_URL:https://api.openweathermap.org}
 
 logging:
