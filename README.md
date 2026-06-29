@@ -20,13 +20,18 @@ Two-tier Tour Planner implementation for the semester project:
 
 ## Configuration
 
-Backend configuration is kept outside source code through environment variables. Defaults are provided for local development:
+Backend configuration is kept outside source code through environment variables. Defaults are provided for local development for DB and image directory.
 
-\backend\src\main\resources\application.yml
+**The API keys must be provided before starting the backend.** Create a file `backend/.env` with the following content:
+
+```
+ORS_API_KEY=<your-openrouteservice-key>
+OPENWEATHER_API_KEY=<your-openweather-key>
+```
+
+The backend loads this file automatically on startup. Alternatively, set the variables via PowerShell:
 
 ```powershell
-\backend\src\main\resources\application.yml
-
 $env:DB_URL="jdbc:postgresql://localhost:5432/tourplanner"
 $env:DB_USER="tourplanner"
 $env:DB_PASSWORD="tourplanner"

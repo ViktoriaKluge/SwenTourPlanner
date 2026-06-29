@@ -271,8 +271,9 @@ export class TourViewModelService {
   }
 
   async addTour(tour: Tour): Promise<void> {
-    await this.tourService.add(tour);
+    const saved = await this.tourService.add(tour);
     this.isAddingTour.set(false);
+    if (saved?.id) this.selectedTourId.set(saved.id);
   }
 
   async updateTour(tour: Tour): Promise<void> {

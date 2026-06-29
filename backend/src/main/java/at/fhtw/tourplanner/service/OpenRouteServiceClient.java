@@ -17,6 +17,7 @@ import java.util.*;
 @Service
 public class OpenRouteServiceClient {
   private static final Logger log = LoggerFactory.getLogger(OpenRouteServiceClient.class);
+  private static final double RUNNING_SPEED_KMH = 8.0;
   private final AppProperties properties;
   private final ObjectMapper objectMapper;
   private final RestTemplate restTemplate = new RestTemplate();
@@ -52,6 +53,9 @@ public class OpenRouteServiceClient {
         latLngs.add(Arrays.asList(coordinate.get(1).asDouble(), coordinate.get(0).asDouble()));
       }
       current.setGeometryJson(objectMapper.writeValueAsString(latLngs));
+      if (type == TransportType.running) {
+        current.setDurationMin((int) Math.round(current.getDistance() / RUNNING_SPEED_KMH * 60));
+      }
     } catch (Exception ex) {
       log.warn("OpenRouteService request failed, keeping submitted route values: {}", ex.getMessage());
     }

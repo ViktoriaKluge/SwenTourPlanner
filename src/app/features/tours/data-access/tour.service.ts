@@ -16,9 +16,10 @@ export class TourService {
     this.tours.set((tours ?? []).map(this.normalizeTour));
   }
 
-  async add(tour: Tour): Promise<void> {
+  async add(tour: Tour): Promise<Tour | null> {
     const saved = await firstValueFrom(this.http.post<Tour>('/api/tours', tour, this.options(tour.username)));
     if (saved) this.tours.update((arr) => [this.normalizeTour(saved), ...arr]);
+    return saved ? this.normalizeTour(saved) : null;
   }
 
   async update(tour: Tour): Promise<void> {

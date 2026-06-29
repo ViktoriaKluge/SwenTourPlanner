@@ -51,6 +51,13 @@
         </div>
       </div>
 
+      @if (selected()!.childFriendliness) {
+        <div class="info-row">
+          <span class="info-label">Kinderfreundlichkeit</span>
+          <span class="info-value">{{ selected()!.childFriendliness }}</span>
+        </div>
+      }
+
       <div class="info-row">
         <span class="info-label">Startpunkt</span>
         <span class="info-value">

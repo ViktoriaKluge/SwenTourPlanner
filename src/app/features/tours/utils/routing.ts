@@ -1,6 +1,6 @@
 export const ACTIVITY_SPEEDS: Record<string, number> = {
-  hike: 4,   // avg. hiking pace ( ~4 km/h on moderate terrain)
-  run:  10,  // recreational running (~6 min/km)
+  hike: 4,   // avg. hiking pace (~4 km/h on moderate terrain)
+  run:  8,   // recreational jogging (~7:30 min/km)
   bike: 15,  // cycling (15 km/h average)
   walking: 4,
   running: 10,

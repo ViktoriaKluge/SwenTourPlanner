@@ -39,6 +39,9 @@
     <span>
       <strong>Barrierefrei</strong>
       <small>Route bevorzugt stufenarme Wege</small>
+      @if (tourForm.get('accessible')?.value) {
+        <small class="accessibility-hint">Die finale Route kann von der Vorschau abweichen.</small>
+      }
     </span>
   </label>
 

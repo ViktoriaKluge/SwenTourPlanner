@@ -46,20 +46,32 @@ Checked against `semester-project.pdf`.
 - Doppeltes Routing (OSRM im Frontend + ORS im Backend) erklären/begründen – z.B. als Fallback-Design dokumentieren
 - Warum `.env` manuell in `TourPlannerApplication` geladen wird (kein dotenv-Library-Support für Spring Boot 2.7)
 - Frontend ruft Nominatim und OSRM direkt aus dem Browser auf – bewusste Entscheidung oder Optimierungspotential?
+- Welche Design-Patterns wurden verwendet?
+- Haben wir ein Logging Framework und wie funktioniert es? Was loggt es?
 
 ### Was ist gefordert (Double Check)
-- `semester-project.pdf` nochmals komplett durchlesen und mit dieser Checkliste abgleichen
 - Besonders: Wireframes, UML-Diagramme, Protokoll, Zeitaufzeichnung – sind diese Dokumente vollständig?
 - Image-Upload/-Storage: aktuell nur Pfad-Konzept dokumentiert – läuft das auch wirklich im Live-Betrieb durch?
 - Geforderte Designmuster nochmals prüfen: Repository, MVVM, DTO/Mapper – gibt es noch weitere die erwartet werden?
 
 ### Optimierungsoptionen
-- **Routing:** Nur eine Routing-Quelle statt zwei (OSRM Frontend + ORS Backend) – sauberer, weniger Fehlerquellen
-- **ORS API Key:** ✓ Neuer Key eingetragen, funktioniert (kein 403 mehr im Backend-Log)
 - **Fehlerbehandlung im Frontend:** Generische Fehlermeldung „Bitte Backend und Datenbank prüfen" könnte spezifischer sein
-- **`locationToDto` / `locationFromDto`** in `TourMapper`: kein Null-Check – könnte bei ungültigen Daten crashen
 - **Geometrie-Vereinfachung:** OSRM liefert sehr viele Koordinatenpunkte; für lange Routen könnte man die Geometrie vor dem Speichern vereinfachen (Douglas-Peucker o.ä.)
-- **Zeitberechnung prüfen:** Wie wird die Tour-Dauer berechnet? (`calcDurationMin` in `routing.ts` verwendet fixe Durchschnittsgeschwindigkeiten je Kategorie) – ist das realistisch/ausreichend oder wird eine genauere Berechnung erwartet?
-- **Nach Tour-Erstellung automatisch auswählen:** Neue Tour wird nach dem Speichern nicht automatisch im Frontend selektiert – Nutzer muss sie manuell anklicken; wäre bessere UX
-- **Routing-API prüfen:** Ist im Semester-Projekt eine bestimmte API vorgeschrieben (z.B. OpenRouteService)? Aktuell nutzt das Frontend OSRM und das Backend ORS – falls ORS vorgegeben ist, sollte das Frontend ebenfalls nur ORS verwenden (über das Backend), nicht OSRM direkt.
+- Gibt es Sicherheitsmaßnahmen für Eingaben? Sicheres Passwort / injections / prüft user?
+- Speichern wir irgendwas unnötig / doppelt?
+- können andere auf die Tours zugreifen?
+- Was ist im Speicher vom Browser gespeichert?
+- Suche nach Logs?
+- Funktioniert import / export? Was wird geportet?
+- Was genau macht unser unique feature? 
+- Mandatory wiremock vom Design?
+- Wie genau areiten frontend und backend zusammen?
+- Die ganze Dokumentation
+- Type Safty
+- Endge Cases / Fehlermeldungen: was passiert, wenn die apis nicht passen? Wie schaut die Fehlermeldung aus?
+- logs Anzahl in der Übersicht anzeigen
+- von Favoriten auf home - was soll da angezeigt werden? wieder alle touren?
+- werden pois berücksichtigt?
+- full text suche touren / logs gehen nicht
+
 

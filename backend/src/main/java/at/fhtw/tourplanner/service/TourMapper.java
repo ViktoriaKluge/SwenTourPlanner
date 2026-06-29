@@ -85,6 +85,7 @@ public class TourMapper {
   }
 
   private LocationDto locationToDto(LocationEmbeddable loc) {
+    if (loc == null) return new LocationDto();
     LocationDto dto = new LocationDto();
     dto.name = loc.getName();
     dto.latitude = loc.getLatitude();
@@ -93,11 +94,13 @@ public class TourMapper {
   }
 
   private LocationEmbeddable locationFromDto(LocationDto dto) {
+    if (dto == null) return new LocationEmbeddable("", 0, 0);
     return new LocationEmbeddable(dto.name, dto.latitude, dto.longitude);
   }
 
   private RouteDto routeToDto(RouteEmbeddable route) {
     RouteDto dto = new RouteDto();
+    if (route == null) return dto;
     dto.distance = route.getDistance();
     dto.durationMin = route.getDurationMin();
     dto.routeInfo = route.getRouteInfo();
