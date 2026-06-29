@@ -29,7 +29,7 @@ export class HeaderComponent {
     goTo(section: Section): void {
         this.moreOpen.set(false);
         if (section === 'home') {
-            this.tours.goHome();
+            this.tours.resetAll();
         }
         this.auth.setActiveSection(section);
     }

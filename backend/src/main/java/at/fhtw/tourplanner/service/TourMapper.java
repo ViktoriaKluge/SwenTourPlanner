@@ -3,12 +3,14 @@ package at.fhtw.tourplanner.service;
 import at.fhtw.tourplanner.model.*;
 import at.fhtw.tourplanner.dto.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -105,7 +107,7 @@ public class TourMapper {
     dto.durationMin = route.getDurationMin();
     dto.routeInfo = route.getRouteInfo();
     try {
-      dto.geometry = route.getGeometryJson() == null ? new ArrayList<>() : objectMapper.readValue(route.getGeometryJson(), ArrayList.class);
+      dto.geometry = route.getGeometryJson() == null ? new ArrayList<>() : objectMapper.readValue(route.getGeometryJson(), new TypeReference<List<List<Double>>>() {});
     } catch (JsonProcessingException ex) {
       dto.geometry = new ArrayList<>();
     }

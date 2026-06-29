@@ -73,5 +73,7 @@ Checked against `semester-project.pdf`.
 - von Favoriten auf home - was soll da angezeigt werden? wieder alle touren?
 - werden pois berücksichtigt?
 - full text suche touren / logs gehen nicht
+- welche api endpoints benutzen wir und wie notwendig ist das?
+- Was ist Deutsch, was ist Englisch?
 
 

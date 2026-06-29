@@ -54,7 +54,7 @@ public class OpenRouteServiceClient {
       }
       current.setGeometryJson(objectMapper.writeValueAsString(latLngs));
       if (type == TransportType.running) {
-        current.setDurationMin((int) Math.round(current.getDistance() / RUNNING_SPEED_KMH * 60));
+        current.setDurationMin((int) Math.round(current.getDistance() / RUNNING_SPEED_KMH * 60)); // ors duration is not accurate for running, so we calculate it based on distance and average running speed
       }
     } catch (Exception ex) {
       log.warn("OpenRouteService request failed, keeping submitted route values: {}", ex.getMessage());

@@ -55,9 +55,14 @@ export class TourViewModelService {
       const byUser   = t.username === user;
       const byFilter = filters.size === 0 || filters.has(t.category as ActivityFilter);
       const byMode = this.listMode() === 'all' || t.favorite;
-      const bySearch = !q
-        ? true
-        : t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
+      const logText = t.logs.map(l => `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`).join(' ');
+      const haystack = [
+        t.title, t.description, t.category, t.transportType,
+        t.childFriendliness,
+        t.accessible ? 'barrierefrei wheelchair accessible' : '',
+        logText,
+      ].join(' ').toLowerCase();
+      const bySearch = !q ? true : haystack.includes(q);
       return byUser && byFilter && byMode && bySearch;
     });
   });
@@ -146,6 +151,13 @@ export class TourViewModelService {
     this.searchText.set('');
     this.pageSize.set(PAGE_SIZE);
     void this.reload();
+  }
+
+  resetAll(): void {
+    this.goHome();
+    this.setListMode('all');
+    this.activeFilters.set(new Set());
+    this.clearSearch();
   }
 
   // Filters
