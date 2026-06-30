@@ -1,11 +1,7 @@
 export const ACTIVITY_SPEEDS: Record<string, number> = {
-  hike: 4,   // avg. hiking pace (~4 km/h on moderate terrain)
-  run:  8,   // recreational jogging (~7:30 min/km)
-  bike: 15,  // cycling (15 km/h average)
   walking: 4,
   running: 10,
   cycling: 15,
-  driving: 60,
 };
 
 /**
@@ -14,10 +10,10 @@ export const ACTIVITY_SPEEDS: Record<string, number> = {
  */
 export function calcDurationMin(
   distKm: number,
-  category: string,
+  transportType: string,
   paceLevel: number,
 ): number {
-  const speed = ACTIVITY_SPEEDS[category] ?? 4;
+  const speed = ACTIVITY_SPEEDS[transportType] ?? 4;
   const mult  = paceLevel === -1 ? 1.25 : paceLevel === 1 ? 0.75 : 1.0;
   return Math.round((distKm / speed) * 60 * mult);
 }
@@ -31,7 +27,7 @@ export interface RouteResult {
 
 export function routingProfile(activity: string, accessible = false): string {
   if (accessible) return 'foot';
-  if (activity === 'bike' || activity === 'cycling') return 'bike';
+  if (activity === 'cycling') return 'bike';
   return 'foot';
 }
 
@@ -41,7 +37,7 @@ export function routingProfile(activity: string, accessible = false): string {
  */
 export async function fetchOsrmRoute(
   points: Array<{ latitude: number; longitude: number }>,
-  activity = 'driving',
+  activity = 'walking',
   accessible = false,
 ): Promise<RouteResult | null> {
   if (points.length < 2) return null;

@@ -106,7 +106,6 @@ public class TourService {
 
   private boolean routeRelevantFieldsChanged(TourEntity existing, TourDto incoming) {
     if (incoming == null) return false;
-    if (incoming.category != null && incoming.category != existing.getCategory()) return true;
     if (incoming.transportType != null && incoming.transportType != existing.getTransportType()) return true;
     if (incoming.accessible != existing.isAccessible()) return true;
     if (locationChanged(existing.getStartPoint(), incoming.startPoint)) return true;

@@ -16,8 +16,6 @@ public class TourEntity {
   @NotBlank
   private String title;
   @Enumerated(EnumType.STRING)
-  private Category category;
-  @Enumerated(EnumType.STRING)
   private TransportType transportType;
   private boolean accessible;
   private boolean favorite;
@@ -52,8 +50,6 @@ public class TourEntity {
   public void setUser(UserEntity user) { this.user = user; }
   public String getTitle() { return title; }
   public void setTitle(String title) { this.title = title; }
-  public Category getCategory() { return category; }
-  public void setCategory(Category category) { this.category = category; }
   public TransportType getTransportType() { return transportType; }
   public void setTransportType(TransportType transportType) { this.transportType = transportType; }
   public boolean isAccessible() { return accessible; }

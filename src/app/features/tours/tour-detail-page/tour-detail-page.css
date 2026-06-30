@@ -38,9 +38,9 @@
   text-transform: capitalize;
 }
 
-.category-hike  { background: #e6f4ea; color: #276749; }
-.category-run   { background: #fff3cd; color: #856404; }
-.category-bike  { background: #dbeafe; color: #1e40af; }
+.transport-walking  { background: #e6f4ea; color: #276749; }
+.transport-running  { background: #fff3cd; color: #856404; }
+.transport-cycling  { background: #dbeafe; color: #1e40af; }
 
 .close-btn {
   flex-shrink: 0;

@@ -60,10 +60,6 @@ class TourStatsAndSearchTest {
     assertTrue(search.matches(tour("Tour", "Danube island"), "danube"));
   }
 
-  @Test void searchMatchesCategory() {
-    assertTrue(search.matches(tour("Tour", ""), "hike"));
-  }
-
   @Test void searchMatchesTransportType() {
     assertTrue(search.matches(tour("Tour", ""), "walking"));
   }
@@ -140,7 +136,6 @@ class TourStatsAndSearchTest {
     tour.setUser(user);
     tour.setTitle(title);
     tour.setDescription(description);
-    tour.setCategory(Category.hike);
     tour.setTransportType(TransportType.walking);
     RouteEmbeddable route = new RouteEmbeddable();
     route.setDistance(10);

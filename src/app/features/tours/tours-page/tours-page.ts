@@ -24,9 +24,9 @@ export class ToursPageComponent {
   readonly overview = this.state.overview;
 
   readonly filterDefs: { id: ActivityFilter; icon: string; label: string }[] = [
-    { id: 'hike', icon: 'W', label: 'Wandern' },
-    { id: 'run', icon: 'L', label: 'Laufen' },
-    { id: 'bike', icon: 'R', label: 'Radfahren' },
+    { id: 'walking', icon: 'W', label: 'Wandern' },
+    { id: 'running', icon: 'L', label: 'Laufen' },
+    { id: 'cycling', icon: 'R', label: 'Radfahren' },
   ];
 
   isActive(id: ActivityFilter): boolean {

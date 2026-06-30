@@ -20,7 +20,6 @@ public class FullTextSearchService {
     StringBuilder haystack = new StringBuilder()
         .append(tour.getTitle()).append(' ')
         .append(tour.getDescription()).append(' ')
-        .append(tour.getCategory()).append(' ')
         .append(tour.isAccessible() ? "barrierefrei wheelchair accessible" : "").append(' ')
         .append(tour.getTransportType()).append(' ')
         .append(stats.popularity(tour)).append(' ')

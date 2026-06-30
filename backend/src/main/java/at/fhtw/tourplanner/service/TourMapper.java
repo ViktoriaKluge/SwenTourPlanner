@@ -29,7 +29,6 @@ public class TourMapper {
     dto.id = entity.getId();
     dto.username = entity.getUser().getUsername();
     dto.title = entity.getTitle();
-    dto.category = entity.getCategory();
     dto.transportType = entity.getTransportType();
     dto.accessible = entity.isAccessible();
     dto.favorite = entity.isFavorite();
@@ -49,8 +48,7 @@ public class TourMapper {
     entity.setId(dto.id == null || dto.id.trim().isEmpty() ? UUID.randomUUID().toString() : dto.id);
     entity.setUser(user);
     entity.setTitle(dto.title);
-    entity.setCategory(dto.category == null ? Category.hike : dto.category);
-    entity.setTransportType(dto.transportType == null ? transportTypeFromCategory(entity.getCategory()) : dto.transportType);
+    entity.setTransportType(dto.transportType == null ? TransportType.walking : dto.transportType);
     entity.setAccessible(dto.accessible);
     entity.setFavorite(dto.favorite);
     entity.setDescription(dto.description == null ? "" : dto.description);
@@ -127,12 +125,6 @@ public class TourMapper {
       }
     }
     return route;
-  }
-
-  private TransportType transportTypeFromCategory(Category category) {
-    if (category == Category.bike) return TransportType.cycling;
-    if (category == Category.run) return TransportType.running;
-    return TransportType.walking;
   }
 
   private LocalDateTime parseDate(String value) {

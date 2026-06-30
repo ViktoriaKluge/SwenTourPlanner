@@ -44,9 +44,9 @@
   flex-shrink: 0;
 }
 
-.card-icon.category-hike { background: #e6f4ea; }
-.card-icon.category-run  { background: #fff3cd; }
-.card-icon.category-bike { background: #dbeafe; }
+.card-icon.transport-walking  { background: #e6f4ea; }
+.card-icon.transport-running  { background: #fff3cd; }
+.card-icon.transport-cycling  { background: #dbeafe; }
 
 .card-badges {
   display: flex;
@@ -73,9 +73,9 @@
   font-weight: 600;
 }
 
-.card-tag.category-hike { background: #e6f4ea; color: #276749; }
-.card-tag.category-run  { background: #fff3cd; color: #856404; }
-.card-tag.category-bike { background: #dbeafe; color: #1e40af; }
+.card-tag.transport-walking  { background: #e6f4ea; color: #276749; }
+.card-tag.transport-running  { background: #fff3cd; color: #856404; }
+.card-tag.transport-cycling  { background: #dbeafe; color: #1e40af; }
 
 /* Title */
 .card-title {

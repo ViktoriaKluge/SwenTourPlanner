@@ -1,10 +1,10 @@
-export type Category = 'all' | 'hike' | 'run' | 'bike';
+export type TransportType = 'walking' | 'running' | 'cycling';
 
 export type Tour = {
   id: string;
   username: string;
   title: string;
-  category: Category;
+  transportType: TransportType;
   accessible: boolean;
   favorite: boolean;
   description: string;

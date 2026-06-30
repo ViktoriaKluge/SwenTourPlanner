@@ -3,7 +3,7 @@ import { TourService } from '../data-access/tour.service';
 import { AuthService } from '../../auth/services/auth.service';
 import { Tour, TourLog } from '../models/tour.model';
 
-export type ActivityFilter = 'hike' | 'run' | 'bike';
+export type ActivityFilter = 'walking' | 'running' | 'cycling';
 export type TourListMode = 'all' | 'favorites';
 
 const PAGE_SIZE = 5;
@@ -20,7 +20,7 @@ export class TourViewModelService {
   readonly searchInput = signal(localStorage.getItem(SEARCH_KEY) ?? '');
   readonly searchText  = signal(localStorage.getItem(SEARCH_KEY) ?? '');
 
-  // Category filters
+  // Transport type filters
   readonly activeFilters = signal<Set<ActivityFilter>>(
     new Set(this.restoreFilters())
   );
@@ -53,11 +53,11 @@ export class TourViewModelService {
 
     return this.tourService.tours().filter((t) => {
       const byUser   = t.username === user;
-      const byFilter = filters.size === 0 || filters.has(t.category as ActivityFilter);
+      const byFilter = filters.size === 0 || filters.has(t.transportType as ActivityFilter);
       const byMode = this.listMode() === 'all' || t.favorite;
       const logText = t.logs.map(l => `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`).join(' ');
       const haystack = [
-        t.title, t.description, t.category, t.transportType,
+        t.title, t.description, t.transportType,
         t.childFriendliness,
         t.accessible ? 'barrierefrei wheelchair accessible' : '',
         logText,

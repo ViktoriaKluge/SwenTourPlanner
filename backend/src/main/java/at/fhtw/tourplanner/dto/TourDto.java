@@ -1,6 +1,5 @@
 package at.fhtw.tourplanner.dto;
 
-import at.fhtw.tourplanner.model.Category;
 import at.fhtw.tourplanner.model.TransportType;
 
 import javax.validation.Valid;
@@ -13,7 +12,6 @@ public class TourDto {
   public String username;
   @NotBlank
   public String title;
-  public Category category;
   public TransportType transportType;
   public boolean accessible;
   public boolean favorite;

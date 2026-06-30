@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Tour } from '../models/tour.model';
 
 const CATEGORY_META: Record<string, { icon: string; label: string }> = {
-  hike: { icon: 'W', label: 'Wandern' },
-  run: { icon: 'L', label: 'Laufen' },
-  bike: { icon: 'R', label: 'Radfahren' },
+  walking: { icon: 'W', label: 'Wandern' },
+  running: { icon: 'L', label: 'Laufen' },
+  cycling: { icon: 'R', label: 'Radfahren' },
 };
 
 @Component({
@@ -19,7 +19,7 @@ export class TourCardComponent {
   @Output() select = new EventEmitter<Tour>();
 
   get meta() {
-    return CATEGORY_META[this.tour.category] ?? { icon: 'T', label: this.tour.category };
+    return CATEGORY_META[this.tour.transportType] ?? { icon: 'T', label: this.tour.transportType };
   }
 
   choose(): void {

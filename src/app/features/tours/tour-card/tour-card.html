@@ -5,12 +5,12 @@
   (click)="choose()"
 >
   <div class="card-top">
-    <div class="card-icon category-{{ tour.category }}">{{ meta.icon }}</div>
+    <div class="card-icon transport-{{ tour.transportType }}">{{ meta.icon }}</div>
     <div class="card-badges">
       @if (tour.favorite) {
         <span class="favorite-chip" aria-label="Favorit">★</span>
       }
-      <span class="card-tag category-{{ tour.category }}">{{ meta.label }}</span>
+      <span class="card-tag transport-{{ tour.transportType }}">{{ meta.label }}</span>
     </div>
   </div>
 
