@@ -16,10 +16,19 @@ const CATEGORY_META: Record<string, { icon: string; label: string }> = {
 export class TourCardComponent {
   @Input({ required: true }) tour!: Tour;
   @Input({ required: true, transform: (v: unknown) => Boolean(v) }) active!: boolean;
+  @Input() searchTerm = '';
   @Output() select = new EventEmitter<Tour>();
 
   get meta() {
     return CATEGORY_META[this.tour.transportType] ?? { icon: 'T', label: this.tour.transportType };
+  }
+
+  get matchedLogCount(): number {
+    const q = this.searchTerm.trim().toLowerCase();
+    if (!q) return 0;
+    return this.tour.logs.filter(l =>
+      `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`.toLowerCase().includes(q)
+    ).length;
   }
 
   choose(): void {

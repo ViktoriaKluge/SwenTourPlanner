@@ -1,10 +1,10 @@
 package at.fhtw.tourplanner.util;
 
 public enum ChildFriendliness {
-  FRIENDLY("child-friendly"),
-  MODERATE("moderate"),
-  DEMANDING("demanding"),
-  UNKNOWN("unknown");
+  FRIENDLY("kinderfreundlich"),
+  MODERATE("moderat"),
+  DEMANDING("anspruchsvoll"),
+  UNKNOWN("unbekannt");
 
   private final String label;
 

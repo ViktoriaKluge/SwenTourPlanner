@@ -76,6 +76,7 @@
 .card-tag.transport-walking  { background: #e6f4ea; color: #276749; }
 .card-tag.transport-running  { background: #fff3cd; color: #856404; }
 .card-tag.transport-cycling  { background: #dbeafe; color: #1e40af; }
+.card-tag.accessible-tag     { background: #ccfbf1; color: #0f766e; }
 
 /* Title */
 .card-title {
@@ -112,4 +113,14 @@
 .card-stat {
   font-size: 0.78rem;
   color: #718096;
+}
+
+.log-match-hint {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0f766e;
+  background: #ccfbf1;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  align-self: flex-start;
 }

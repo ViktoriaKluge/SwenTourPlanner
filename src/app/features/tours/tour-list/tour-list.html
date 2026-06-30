@@ -9,6 +9,7 @@
         <app-tour-card
           [tour]="tour"
           [active]="selectedId() === tour.id"
+          [searchTerm]="state.searchText()"
           (select)="onSelect($event)"
         />
       }

@@ -38,7 +38,6 @@ public class TourEntity {
   @ElementCollection
   @CollectionTable(name = "tour_pois", joinColumns = @JoinColumn(name = "tour_id"))
   private List<LocationEmbeddable> poi = new ArrayList<>();
-  private String image;
   @Valid
   private RouteEmbeddable route = new RouteEmbeddable();
   @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -64,8 +63,6 @@ public class TourEntity {
   public void setEndPoint(LocationEmbeddable endPoint) { this.endPoint = endPoint; }
   public List<LocationEmbeddable> getPoi() { return poi; }
   public void setPoi(List<LocationEmbeddable> poi) { this.poi = poi; }
-  public String getImage() { return image; }
-  public void setImage(String image) { this.image = image; }
   public RouteEmbeddable getRoute() { return route; }
   public void setRoute(RouteEmbeddable route) { this.route = route; }
   public List<TourLogEntity> getLogs() { return logs; }

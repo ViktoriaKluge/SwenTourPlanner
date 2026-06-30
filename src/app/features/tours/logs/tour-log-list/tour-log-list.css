@@ -57,6 +57,20 @@
   background: #f5f7ff;
 }
 
+.log-entry--match {
+  border-color: #0f766e;
+  background: #f0fdf9;
+}
+
+.log-match-summary {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0f766e;
+  background: #ccfbf1;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+}
+
 .log-entry-header {
   display: flex;
   justify-content: space-between;

@@ -51,7 +51,6 @@ Checked against `semester-project.pdf`.
 
 ### Was ist gefordert (Double Check)
 - Besonders: Wireframes, UML-Diagramme, Protokoll, Zeitaufzeichnung – sind diese Dokumente vollständig?
-- Image-Upload/-Storage: aktuell nur Pfad-Konzept dokumentiert – läuft das auch wirklich im Live-Betrieb durch?
 - Geforderte Designmuster nochmals prüfen: Repository, MVVM, DTO/Mapper – gibt es noch weitere die erwartet werden?
 
 ### Optimierungsoptionen
@@ -59,21 +58,15 @@ Checked against `semester-project.pdf`.
 - **Geometrie-Vereinfachung:** OSRM liefert sehr viele Koordinatenpunkte; für lange Routen könnte man die Geometrie vor dem Speichern vereinfachen (Douglas-Peucker o.ä.)
 - Gibt es Sicherheitsmaßnahmen für Eingaben? Sicheres Passwort / injections / prüft user?
 - Speichern wir irgendwas unnötig / doppelt?
-- können andere auf die Tours zugreifen?
 - Was ist im Speicher vom Browser gespeichert?
-- Suche nach Logs?
-- Funktioniert import / export? Was wird geportet?
 - Was genau macht unser unique feature? 
 - Mandatory wiremock vom Design?
 - Wie genau areiten frontend und backend zusammen?
 - Die ganze Dokumentation
 - Type Safty
 - Endge Cases / Fehlermeldungen: was passiert, wenn die apis nicht passen? Wie schaut die Fehlermeldung aus?
-- logs Anzahl in der Übersicht anzeigen
-- von Favoriten auf home - was soll da angezeigt werden? wieder alle touren?
-- werden pois berücksichtigt?
-- full text suche touren / logs gehen nicht
 - welche api endpoints benutzen wir und wie notwendig ist das?
-- Was ist Deutsch, was ist Englisch?
 
 
+### Offene Fragen
+- **Exportieren:** mit Logs? auch einzelne Tours?

@@ -51,6 +51,10 @@ export class TourService {
     return `/api/tours/export?username=${encodeURIComponent(username)}`;
   }
 
+  exportTourUrl(tourId: string, username: string): string {
+    return `/api/tours/${tourId}/export?username=${encodeURIComponent(username)}`;
+  }
+
   async importTours(username: string, tours: Tour[]): Promise<void> {
     const imported = await firstValueFrom(this.http.post<Tour[]>('/api/tours/import', tours, this.options(username)));
     this.tours.set((imported ?? []).map(this.normalizeTour));

@@ -10,6 +10,9 @@
       @if (tour.favorite) {
         <span class="favorite-chip" aria-label="Favorit">★</span>
       }
+      @if (tour.accessible) {
+        <span class="card-tag accessible-tag" aria-label="Barrierefrei">♿ Barrierefrei</span>
+      }
       <span class="card-tag transport-{{ tour.transportType }}">{{ meta.label }}</span>
     </div>
   </div>
@@ -25,4 +28,8 @@
     <span class="card-stat">{{ tour.route.durationMin }} Min.</span>
     <span class="card-stat">{{ tour.logs.length }} {{ tour.logs.length === 1 ? 'Log' : 'Logs' }}</span>
   </div>
+
+  @if (matchedLogCount > 0) {
+    <div class="log-match-hint">📓 Treffer in {{ matchedLogCount }} {{ matchedLogCount === 1 ? 'Log' : 'Logs' }}</div>
+  }
 </button>

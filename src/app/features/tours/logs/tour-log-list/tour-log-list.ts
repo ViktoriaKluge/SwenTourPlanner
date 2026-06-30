@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 import { TourViewModelService } from '../../view-model/tour-view-model.service';
 import { TourLog } from '../../models/tour.model';
 import { TourLogFormComponent } from '../tour-log-form/tour-log-form';
@@ -13,6 +13,16 @@ import { TourLogFormComponent } from '../tour-log-form/tour-log-form';
 export class TourLogListComponent {
   readonly tourId = input.required<string>();
   readonly logs   = input<TourLog[]>([]);
+
+  readonly matchingIds = computed(() => {
+    const q = this.state.searchText().trim().toLowerCase();
+    if (!q) return new Set<string>();
+    return new Set(
+      this.logs()
+        .filter(l => `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`.toLowerCase().includes(q))
+        .map(l => l.id)
+    );
+  });
 
   private readonly state = inject(TourViewModelService);
 

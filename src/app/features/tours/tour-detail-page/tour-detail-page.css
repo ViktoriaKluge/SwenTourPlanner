@@ -41,6 +41,14 @@
 .transport-walking  { background: #e6f4ea; color: #276749; }
 .transport-running  { background: #fff3cd; color: #856404; }
 .transport-cycling  { background: #dbeafe; color: #1e40af; }
+.accessible-badge   { background: #ccfbf1; color: #0f766e; }
+
+.detail-badges {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
 
 .close-btn {
   flex-shrink: 0;
@@ -160,6 +168,7 @@
 }
 
 .btn-edit,
+.btn-export,
 .btn-delete {
   flex: 1;
   padding: 0.6rem 1rem;
@@ -170,12 +179,24 @@
   cursor: pointer;
   transition: filter 0.15s;
   min-width: 120px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-edit {
   background: #eef0fd;
   color: #667eea;
 }
+
+.btn-export {
+  background: #f0fdf9;
+  color: #0f766e;
+}
+
+.btn-export:hover { filter: brightness(0.95); }
 
 .btn-edit:hover { filter: brightness(0.95); }
 

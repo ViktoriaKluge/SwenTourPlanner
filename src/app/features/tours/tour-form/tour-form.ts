@@ -84,7 +84,6 @@ export class TourFormComponent {
       transportType: ['walking', Validators.required],
       accessible: [false],
       description: [''],
-      image: [''],
       startPoint: this.fb.group({
         name: ['', Validators.required],
         latitude: [null, [Validators.required, Validators.min(-90), Validators.max(90)]],
@@ -292,7 +291,6 @@ export class TourFormComponent {
           accessible: !!v.accessible,
           favorite: false,
           description: v.description,
-          image: v.image || 'tba',
           startPoint: v.startPoint,
           endPoint: v.endPoint,
           poi: v.pois ?? [],

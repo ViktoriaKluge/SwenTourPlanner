@@ -56,10 +56,14 @@ export class TourViewModelService {
       const byFilter = filters.size === 0 || filters.has(t.transportType as ActivityFilter);
       const byMode = this.listMode() === 'all' || t.favorite;
       const logText = t.logs.map(l => `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`).join(' ');
+      const transportDE: Record<string, string> = { walking: 'wandern', running: 'laufen', cycling: 'radfahren' };
+      const poiText = t.poi.map(p => p.name).join(' ');
       const haystack = [
-        t.title, t.description, t.transportType,
+        t.title, t.description, t.transportType, transportDE[t.transportType] ?? '',
         t.childFriendliness,
         t.accessible ? 'barrierefrei wheelchair accessible' : '',
+        t.startPoint.name, t.endPoint.name, poiText,
+        t.route.distance, t.route.durationMin,
         logText,
       ].join(' ').toLowerCase();
       const bySearch = !q ? true : haystack.includes(q);

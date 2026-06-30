@@ -21,7 +21,6 @@ public class TourDto {
   @Valid
   public LocationDto endPoint;
   public List<LocationDto> poi = new ArrayList<>();
-  public String image;
   @Valid
   public RouteDto route;
   public List<TourLogDto> logs = new ArrayList<>();

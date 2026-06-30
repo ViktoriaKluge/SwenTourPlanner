@@ -11,7 +11,6 @@ export type Tour = {
   startPoint: Location;
   endPoint: Location;
   poi: Location[];
-  image: string;
   route: Route;
   logs: TourLog[];
   popularity?: number;

@@ -7,9 +7,14 @@
       <div class="detail-header">
         <div>
           <h2 class="detail-title">{{ selected()!.title }}</h2>
-          <span class="category-badge transport-{{ selected()!.transportType }}">
-            {{ selected()!.transportType }}
-          </span>
+          <div class="detail-badges">
+            <span class="category-badge transport-{{ selected()!.transportType }}">
+              {{ selected()!.transportType }}
+            </span>
+            @if (selected()!.accessible) {
+              <span class="category-badge accessible-badge" aria-label="Barrierefrei">♿ Barrierefrei</span>
+            }
+          </div>
         </div>
         <div class="detail-header-actions">
           <button
@@ -130,6 +135,7 @@
 
       <div class="detail-actions">
         <button class="btn-edit" type="button" (click)="startEdit()" [disabled]="deleting()">Bearbeiten</button>
+        <a class="btn-export" [href]="exportUrl()" download="tour-export.json">Exportieren</a>
         <button class="btn-delete" type="button" (click)="requestDelete()" [disabled]="deleting()">Loeschen</button>
       </div>
 

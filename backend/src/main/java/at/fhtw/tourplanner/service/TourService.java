@@ -43,6 +43,11 @@ public class TourService {
   }
 
   @Transactional(readOnly = true)
+  public TourDto get(String username, String id) {
+    return mapper.toDto(findTour(username, id));
+  }
+
+  @Transactional(readOnly = true)
   public List<TourDto> search(String username, String query) {
     return tours.findByUserUsernameOrderByTitleAsc(username).stream()
         .filter(tour -> search.matches(tour, query))
@@ -54,7 +59,7 @@ public class TourService {
   public TourDto create(String username, TourDto dto) {
     UserEntity user = auth.find(username);
     TourEntity entity = mapper.apply(dto, new TourEntity(), user);
-    entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getTransportType(), entity.isAccessible()));
+    entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getPoi(), entity.getTransportType(), entity.isAccessible()));
     log.info("Creating tour {} for {}", entity.getTitle(), username);
     return mapper.toDto(tours.save(entity));
   }
@@ -66,7 +71,7 @@ public class TourService {
     mapper.apply(dto, entity, entity.getUser());
     entity.setId(id);
     if (routeNeedsRefresh) {
-      entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getTransportType(), entity.isAccessible()));
+      entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getPoi(), entity.getTransportType(), entity.isAccessible()));
     }
     log.info("Updating tour {} for {}", id, username);
     return mapper.toDto(tours.save(entity));

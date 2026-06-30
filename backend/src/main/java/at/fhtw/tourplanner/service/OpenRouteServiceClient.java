@@ -27,18 +27,23 @@ public class OpenRouteServiceClient {
     this.objectMapper = objectMapper;
   }
 
-  public RouteEmbeddable enrich(RouteEmbeddable current, LocationEmbeddable start, LocationEmbeddable end, TransportType type, boolean accessible) {
+  public RouteEmbeddable enrich(RouteEmbeddable current, LocationEmbeddable start, LocationEmbeddable end, List<LocationEmbeddable> waypoints, TransportType type, boolean accessible) {
     if (properties.getOpenRouteService().getApiKey() == null || properties.getOpenRouteService().getApiKey().trim().isEmpty()) {
       return current;
     }
     try {
       String profile = profile(type, accessible);
       String url = properties.getOpenRouteService().getBaseUrl() + "/v2/directions/" + profile + "/geojson";
+      List<List<Double>> coordinates = new ArrayList<>();
+      coordinates.add(Arrays.asList(start.getLongitude(), start.getLatitude()));
+      if (waypoints != null) {
+        for (LocationEmbeddable wp : waypoints) {
+          coordinates.add(Arrays.asList(wp.getLongitude(), wp.getLatitude()));
+        }
+      }
+      coordinates.add(Arrays.asList(end.getLongitude(), end.getLatitude()));
       Map<String, Object> body = new HashMap<>();
-      body.put("coordinates", Arrays.asList(
-          Arrays.asList(start.getLongitude(), start.getLatitude()),
-          Arrays.asList(end.getLongitude(), end.getLatitude())
-      ));
+      body.put("coordinates", coordinates);
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("Authorization", properties.getOpenRouteService().getApiKey());

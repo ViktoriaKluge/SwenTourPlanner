@@ -17,6 +17,12 @@ export class TourDetailPageComponent {
   protected readonly state = inject(TourViewModelService);
   private readonly tourService = inject(TourService);
 
+  exportUrl(): string {
+    const tour = this.selected();
+    if (!tour) return '';
+    return this.tourService.exportTourUrl(tour.id, tour.username);
+  }
+
   readonly selected = this.state.selectedTour;
   readonly editing  = signal(false);
   readonly confirmDeleteOpen = signal(false);

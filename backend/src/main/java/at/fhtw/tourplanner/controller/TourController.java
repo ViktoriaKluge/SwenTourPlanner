@@ -7,6 +7,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -65,14 +66,34 @@ public class TourController {
 
   @GetMapping("/export")
   public ResponseEntity<List<TourDto>> exportTours(@RequestParam String username) {
+    List<TourDto> dtos = tours.list(username);
+    dtos.forEach(dto -> {
+      dto.id = null;
+      dto.username = null;
+      dto.favorite = false;
+    });
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=tour-export.json")
-        .body(tours.list(username));
+        .body(dtos);
+  }
+
+  @GetMapping("/{id}/export")
+  public ResponseEntity<List<TourDto>> exportTour(@PathVariable String id, @RequestParam String username) {
+    TourDto dto = tours.get(username, id);
+    dto.id = null;
+    dto.username = null;
+    dto.favorite = false;
+    return ResponseEntity.ok()
+        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=tour-export.json")
+        .body(Collections.singletonList(dto));
   }
 
   @PostMapping("/import")
   public List<TourDto> importTours(@RequestHeader("X-User") String username, @RequestBody List<TourDto> imported) {
-    imported.forEach(dto -> tours.create(username, dto));
+    imported.forEach(dto -> {
+      dto.id = null;
+      tours.create(username, dto);
+    });
     return tours.list(username);
   }
 }

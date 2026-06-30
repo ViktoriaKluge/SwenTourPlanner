@@ -27,8 +27,14 @@
     </div>
   }
 
+  @if (matchingIds().size > 0) {
+    <div class="log-match-summary">
+      📓 {{ matchingIds().size }} von {{ logs().length }} {{ logs().length === 1 ? 'Log' : 'Logs' }} trifft die Suche
+    </div>
+  }
+
   @for (log of logs(); track log.id) {
-    <div class="log-entry" [class.editing]="editingLog()?.id === log.id">
+    <div class="log-entry" [class.editing]="editingLog()?.id === log.id" [class.log-entry--match]="matchingIds().has(log.id)">
       <div class="log-entry-header">
         <span class="log-date">{{ formatDate(log.date) }}</span>
         <div class="log-entry-actions">

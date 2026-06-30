@@ -36,7 +36,6 @@ public class TourMapper {
     dto.startPoint = locationToDto(entity.getStartPoint());
     dto.endPoint = locationToDto(entity.getEndPoint());
     dto.poi = entity.getPoi().stream().map(this::locationToDto).collect(Collectors.toList());
-    dto.image = entity.getImage();
     dto.route = routeToDto(entity.getRoute());
     dto.logs = entity.getLogs().stream().map(this::logToDto).collect(Collectors.toList());
     dto.popularity = stats.popularity(entity);
@@ -55,7 +54,6 @@ public class TourMapper {
     entity.setStartPoint(locationFromDto(dto.startPoint));
     entity.setEndPoint(locationFromDto(dto.endPoint));
     entity.setPoi(dto.poi == null ? new ArrayList<>() : dto.poi.stream().map(this::locationFromDto).collect(Collectors.toList()));
-    entity.setImage(dto.image == null || dto.image.trim().isEmpty() ? "tba" : dto.image);
     entity.setRoute(routeFromDto(dto.route));
     return entity;
   }
