@@ -30,6 +30,7 @@ export class LoginComponent {
             const password = this.loginForm.get('password')?.value;
             this.error = '';
             this.busy.set(true);
+            this.loginForm.disable();
             try {
                 if (this.registerMode) {
                     await this.auth.register(name, password);
@@ -47,6 +48,7 @@ export class LoginComponent {
                     : 'Login fehlgeschlagen. Bitte Username und Passwort prüfen.';
             } finally {
                 this.busy.set(false);
+                this.loginForm.enable();
             }
         }
     }

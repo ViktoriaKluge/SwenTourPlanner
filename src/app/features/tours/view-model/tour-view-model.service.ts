@@ -1,7 +1,7 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { TourService } from '../data-access/tour.service';
 import { AuthService } from '../../auth/services/auth.service';
-import { Tour, TourLog } from '../models/tour.model';
+import { Tour, TourLog, Weather } from '../models/tour.model';
 
 export type ActivityFilter = 'walking' | 'running' | 'cycling';
 export type TourListMode = 'all' | 'favorites';
@@ -143,7 +143,8 @@ export class TourViewModelService {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
       this.searchText.set(text);
-      this.pageSize.set(PAGE_SIZE);
+      // Reset to page size only when starting a new search; clearing shows all
+      this.pageSize.set(text.trim() ? PAGE_SIZE : Number.MAX_SAFE_INTEGER);
       this.deselectIfGone();
       void this.reload();
     }, 700);
@@ -153,7 +154,7 @@ export class TourViewModelService {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.searchInput.set('');
     this.searchText.set('');
-    this.pageSize.set(PAGE_SIZE);
+    this.pageSize.set(Number.MAX_SAFE_INTEGER);
     void this.reload();
   }
 
@@ -322,6 +323,14 @@ export class TourViewModelService {
 
   exportUrl(): string {
     return this.tourService.exportUrl(this.authService.activeSession().username);
+  }
+
+  exportTourUrl(tourId: string, username: string): string {
+    return this.tourService.exportTourUrl(tourId, username);
+  }
+
+  async loadWeather(tour: Tour): Promise<Weather | null> {
+    return this.tourService.loadWeather(tour);
   }
 
   async importTours(file: File): Promise<void> {

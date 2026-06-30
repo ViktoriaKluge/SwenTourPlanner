@@ -54,11 +54,10 @@ Checked against `semester-project.pdf`.
 - Geforderte Designmuster nochmals prüfen: Repository, MVVM, DTO/Mapper – gibt es noch weitere die erwartet werden?
 
 ### Optimierungsoptionen
-- **Fehlerbehandlung im Frontend:** Generische Fehlermeldung „Bitte Backend und Datenbank prüfen" könnte spezifischer sein
-- **Geometrie-Vereinfachung:** OSRM liefert sehr viele Koordinatenpunkte; für lange Routen könnte man die Geometrie vor dem Speichern vereinfachen (Douglas-Peucker o.ä.)
+- **Fehlerbehandlung im Frontend:** spezifische Exceptions, Fehlermeldungen genauer, keine uncatched exceptions
 - Gibt es Sicherheitsmaßnahmen für Eingaben? Sicheres Passwort / injections / prüft user?
 - Speichern wir irgendwas unnötig / doppelt?
-- Was ist im Speicher vom Browser gespeichert?
+- Was ist im Speicher vom Browser gespeichert? darkmode / eingeloggt bleiben
 - Was genau macht unser unique feature? 
 - Mandatory wiremock vom Design?
 - Wie genau areiten frontend und backend zusammen?
@@ -66,7 +65,10 @@ Checked against `semester-project.pdf`.
 - Type Safty
 - Endge Cases / Fehlermeldungen: was passiert, wenn die apis nicht passen? Wie schaut die Fehlermeldung aus?
 - welche api endpoints benutzen wir und wie notwendig ist das?
+- password in plain text mitgeschickt?
+- specific exceptions
 
 
 ### Offene Fragen
-- **Exportieren:** mit Logs? auch einzelne Tours?
+- **Exportieren:** mit Logs?
+- **FAQ.** mit userguide und zB Berechnungen

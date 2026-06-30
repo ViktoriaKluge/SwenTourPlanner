@@ -3,7 +3,6 @@ import { TourViewModelService } from '../view-model/tour-view-model.service';
 import { TourFormComponent } from '../tour-form/tour-form';
 import { TourMapComponent } from '../tour-map/tour-map';
 import { TourLogListComponent } from '../logs/tour-log-list/tour-log-list';
-import { TourService } from '../data-access/tour.service';
 import { Tour, Weather } from '../models/tour.model';
 
 @Component({
@@ -15,12 +14,11 @@ import { Tour, Weather } from '../models/tour.model';
 })
 export class TourDetailPageComponent {
   protected readonly state = inject(TourViewModelService);
-  private readonly tourService = inject(TourService);
 
   exportUrl(): string {
     const tour = this.selected();
     if (!tour) return '';
-    return this.tourService.exportTourUrl(tour.id, tour.username);
+    return this.state.exportTourUrl(tour.id, tour.username);
   }
 
   readonly selected = this.state.selectedTour;
@@ -148,7 +146,7 @@ export class TourDetailPageComponent {
   private async loadWeather(tour: Tour): Promise<void> {
     this.weatherLoading.set(true);
     try {
-      this.weather.set(await this.tourService.loadWeather(tour));
+      this.weather.set(await this.state.loadWeather(tour));
     } catch {
       this.weatherError.set('Wetterdaten konnten nicht geladen werden.');
     } finally {
