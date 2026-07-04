@@ -335,7 +335,15 @@ export class TourViewModelService {
 
   async importTours(file: File): Promise<void> {
     const text = await file.text();
-    const tours = JSON.parse(text) as Tour[];
+    let tours: Tour[];
+    try {
+      tours = JSON.parse(text) as Tour[];
+    } catch {
+      throw new Error('Die Datei enthält kein gültiges JSON.');
+    }
+    if (tours.length > 100) {
+      throw new Error(`Die Datei enthält ${tours.length} Touren. Pro Import sind maximal 100 erlaubt.`);
+    }
     await this.tourService.importTours(this.authService.activeSession().username, tours);
   }
 

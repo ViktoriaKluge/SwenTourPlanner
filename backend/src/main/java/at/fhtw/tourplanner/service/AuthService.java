@@ -2,6 +2,8 @@ package at.fhtw.tourplanner.service;
 
 import at.fhtw.tourplanner.model.UserEntity;
 import at.fhtw.tourplanner.repo.UserRepository;
+import at.fhtw.tourplanner.util.BadRequestException;
+import at.fhtw.tourplanner.util.InvalidCredentialsException;
 import at.fhtw.tourplanner.util.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,7 @@ public class AuthService {
   }
 
   public UserEntity register(String username, String password) {
-    if (users.existsByUsername(username)) throw new IllegalArgumentException("Username already exists");
+    if (users.existsByUsername(username)) throw new BadRequestException("Username bereits vergeben");
     UserEntity user = new UserEntity();
     user.setUsername(username);
     user.setPasswordHash(encoder.encode(password));
@@ -30,7 +32,7 @@ public class AuthService {
   public UserEntity login(String username, String password) {
     UserEntity user = find(username);
     if (!encoder.matches(password, user.getPasswordHash())) {
-      throw new IllegalArgumentException("Invalid credentials");
+      throw new InvalidCredentialsException("Ungültige Anmeldedaten");
     }
     log.info("User {} logged in", username);
     return user;

@@ -34,10 +34,10 @@
           <button class="more-action" type="button" role="menuitem" (click)="goTo('about')">About</button>
 
           @if (this.session().loggedIn) {
-            <a class="more-action" [href]="exportUrl()" role="menuitem" (click)="closeMoreMenu()">Export</a>
-            <label class="more-action more-action--file" role="menuitem">
+            <button class="more-action" type="button" role="menuitem" (click)="exportAll()">Export</button>
+            <label class="more-action more-action--file" role="menuitem" title="Maximal 100 Touren pro Import">
               <input type="file" accept="application/json" hidden (change)="importFile($event)" />
-              Import
+              Import <span style="opacity:.6;font-size:.8em">(max. 100)</span>
             </label>
             <button class="more-action" type="button" role="menuitem" (click)="logout()">Logout</button>
           } @else {

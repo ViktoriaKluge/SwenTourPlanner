@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -23,7 +24,14 @@ public class WeatherService {
 
   private final AppProperties properties;
   private final ObjectMapper objectMapper;
-  private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate = buildRestTemplate();
+
+  private static RestTemplate buildRestTemplate() {
+    SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+    f.setConnectTimeout(5_000);
+    f.setReadTimeout(10_000);
+    return new RestTemplate(f);
+  }
 
   public WeatherService(AppProperties properties, ObjectMapper objectMapper) {
     this.properties = properties;

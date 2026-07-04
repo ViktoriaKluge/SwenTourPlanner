@@ -48,10 +48,24 @@ export async function fetchOsrmRoute(
       `https://router.project-osrm.org/route/v1/${profile}/${coords}` +
       `?overview=full&geometries=geojson`,
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`OSRM: HTTP ${res.status} für Profil "${profile}"`);
+      return null;
+    }
     const data = await res.json();
-    if (data.code !== 'Ok' || !data.routes?.[0]) return null;
-    const r = data.routes[0];
+    if (data.code !== 'Ok') {
+      console.error(`OSRM: Code "${data.code}" – keine Route gefunden`);
+      return null;
+    }
+    const r = data.routes?.[0];
+    if (!r) {
+      console.error('OSRM: Antwort enthält keine Routen');
+      return null;
+    }
+    if (!Array.isArray(r.geometry?.coordinates)) {
+      console.error('OSRM: Ungültige Geometrie in der Antwort');
+      return null;
+    }
     return {
       distanceM: r.distance,
       durationS: r.duration,
@@ -60,7 +74,8 @@ export async function fetchOsrmRoute(
       ),
       profile,
     };
-  } catch {
+  } catch (e) {
+    console.error('OSRM: Netzwerkfehler beim Routing', e);
     return null;
   }
 }

@@ -144,3 +144,13 @@
   color: #9d174d;
   letter-spacing: 0.05em;
 }
+
+.log-error {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+}

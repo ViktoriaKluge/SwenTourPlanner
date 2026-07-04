@@ -11,6 +11,10 @@
     }
   </div>
 
+  @if (logError()) {
+    <div class="log-error" role="alert">{{ logError() }}</div>
+  }
+
   <!-- Form: add or edit -->
   @if (addingLog() || editingLog()) {
     <app-tour-log-form

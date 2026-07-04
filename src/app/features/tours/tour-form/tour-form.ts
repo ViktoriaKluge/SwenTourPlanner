@@ -174,7 +174,8 @@ export class TourFormComponent {
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&accept-language=de`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Geocoding fehlgeschlagen: ${res.status}`);
-      this.setSuggestions(field, await res.json());
+      const results = await res.json();
+      this.setSuggestions(field, Array.isArray(results) ? results : []);
     } catch {
       this.setSuggestions(field, []);
     }

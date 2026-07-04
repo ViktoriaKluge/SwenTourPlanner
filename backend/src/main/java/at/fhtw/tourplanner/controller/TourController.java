@@ -3,6 +3,7 @@ package at.fhtw.tourplanner.controller;
 import at.fhtw.tourplanner.service.TourService;
 import at.fhtw.tourplanner.dto.TourDto;
 import at.fhtw.tourplanner.dto.TourLogDto;
+import at.fhtw.tourplanner.util.BadRequestException;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tours")
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 public class TourController {
   private final TourService tours;
 
@@ -90,6 +91,9 @@ public class TourController {
 
   @PostMapping("/import")
   public List<TourDto> importTours(@RequestHeader("X-User") String username, @RequestBody List<TourDto> imported) {
+    if (imported.size() > 100) {
+      throw new BadRequestException("Maximal 100 Touren pro Import erlaubt.");
+    }
     imported.forEach(dto -> {
       dto.id = null;
       tours.create(username, dto);

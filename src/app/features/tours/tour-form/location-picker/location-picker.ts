@@ -94,7 +94,8 @@ export class LocationPickerComponent implements AfterViewInit, OnDestroy {
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&accept-language=de`;
       const res  = await fetch(url);
       if (!res.ok) throw new Error(`Geocoding fehlgeschlagen: ${res.status}`);
-      this.suggestions.set(await res.json());
+      const results = await res.json();
+      this.suggestions.set(Array.isArray(results) ? results : []);
     } catch {
       this.suggestions.set([]);
     } finally {

@@ -1,5 +1,7 @@
 package at.fhtw.tourplanner.controller;
 
+import at.fhtw.tourplanner.util.BadRequestException;
+import at.fhtw.tourplanner.util.InvalidCredentialsException;
 import at.fhtw.tourplanner.util.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,13 @@ public class RestExceptionHandler {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", ex.getMessage()));
   }
 
-  @ExceptionHandler({IllegalArgumentException.class, MethodArgumentNotValidException.class})
+  @ExceptionHandler({BadRequestException.class, MethodArgumentNotValidException.class})
   public ResponseEntity<Map<String, String>> badRequest(Exception ex) {
     return ResponseEntity.badRequest().body(Collections.singletonMap("message", ex.getMessage()));
+  }
+
+  @ExceptionHandler(InvalidCredentialsException.class)
+  public ResponseEntity<Map<String, String>> unauthorized(InvalidCredentialsException ex) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", ex.getMessage()));
   }
 }

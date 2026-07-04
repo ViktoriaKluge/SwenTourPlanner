@@ -28,6 +28,7 @@ export class TourLogListComponent {
 
   readonly addingLog  = signal(false);
   readonly editingLog = signal<TourLog | null>(null);
+  readonly logError   = signal<string | null>(null);
 
   openAdd(): void {
     this.addingLog.set(true);
@@ -45,16 +46,26 @@ export class TourLogListComponent {
   }
 
   async saveLog(log: TourLog): Promise<void> {
-    if (this.editingLog()) {
-      await this.state.updateLog(this.tourId(), log);
-    } else {
-      await this.state.addLog(this.tourId(), log);
+    try {
+      if (this.editingLog()) {
+        await this.state.updateLog(this.tourId(), log);
+      } else {
+        await this.state.addLog(this.tourId(), log);
+      }
+      this.logError.set(null);
+      this.closeForm();
+    } catch {
+      this.logError.set('Log konnte nicht gespeichert werden. Bitte Backend und Datenbank prüfen.');
     }
-    this.closeForm();
   }
 
   async deleteLog(logId: string): Promise<void> {
-    await this.state.deleteLog(this.tourId(), logId);
+    try {
+      await this.state.deleteLog(this.tourId(), logId);
+      this.logError.set(null);
+    } catch {
+      this.logError.set('Log konnte nicht gelöscht werden. Bitte Backend und Datenbank prüfen.');
+    }
   }
 
   formatDate(date: Date | string): string {

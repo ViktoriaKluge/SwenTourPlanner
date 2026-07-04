@@ -61,15 +61,39 @@ export class HeaderComponent {
         this.moreOpen.set(false);
     }
 
-    exportUrl(): string {
-        return this.tours.exportUrl();
+    async exportAll(): Promise<void> {
+        this.moreOpen.set(false);
+        const url = this.tours.exportUrl();
+        try {
+            const res = await fetch(url);
+            if (!res.ok) return;
+            const data: unknown[] = await res.json();
+            const CHUNK = 100;
+            const chunks = Math.ceil(data.length / CHUNK);
+            for (let i = 0; i < chunks; i++) {
+                const slice = data.slice(i * CHUNK, (i + 1) * CHUNK);
+                const blob = new Blob([JSON.stringify(slice, null, 2)], { type: 'application/json' });
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = chunks === 1 ? 'tour-export.json' : `tour-export-${i + 1}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            }
+        } catch { /* silently ignore */ }
     }
 
     async importFile(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
         if (file) {
-            await this.tours.importTours(file);
+            try {
+                await this.tours.importTours(file);
+            } catch (e: unknown) {
+                alert(e instanceof Error ? e.message : 'Import fehlgeschlagen.');
+            }
         }
         input.value = '';
         this.moreOpen.set(false);

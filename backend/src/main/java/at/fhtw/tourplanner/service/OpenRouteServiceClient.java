@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,7 +21,14 @@ public class OpenRouteServiceClient {
   private static final double RUNNING_SPEED_KMH = 8.0;
   private final AppProperties properties;
   private final ObjectMapper objectMapper;
-  private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate = buildRestTemplate();
+
+  private static RestTemplate buildRestTemplate() {
+    SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+    f.setConnectTimeout(5_000);
+    f.setReadTimeout(10_000);
+    return new RestTemplate(f);
+  }
 
   public OpenRouteServiceClient(AppProperties properties, ObjectMapper objectMapper) {
     this.properties = properties;
@@ -50,6 +58,9 @@ public class OpenRouteServiceClient {
       ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(body, headers), String.class);
       JsonNode root = objectMapper.readTree(response.getBody());
       JsonNode summary = root.at("/features/0/properties/summary");
+      if (summary.isMissingNode()) {
+        throw new Exception("Ungültige ORS-Antwortstruktur: summary fehlt");
+      }
       current.setDistance(Math.round(summary.path("distance").asDouble() / 10.0) / 100.0);
       current.setDurationMin((int) Math.round(summary.path("duration").asDouble() / 60.0));
       current.setRouteInfo("OpenRouteService " + profile);
