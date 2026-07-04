@@ -279,7 +279,7 @@ export class TourViewModelService {
     this.loading.set(true);
     this.error.set(null);
     try {
-      await this.tourService.load(user, this.searchText());
+      await this.tourService.load(this.searchText());
     } catch {
       this.tourService.tours.set([]);
     } finally {
@@ -302,31 +302,52 @@ export class TourViewModelService {
   }
 
   async deleteTour(id: string): Promise<void> {
-    await this.tourService.delete(id, this.authService.activeSession().username);
+    await this.tourService.delete(id);
     this.selectedTourId.set(null);
   }
 
   async addLog(tourId: string, log: TourLog): Promise<void> {
-    await this.tourService.addLog(tourId, log, this.authService.activeSession().username);
+    await this.tourService.addLog(tourId, log);
     await this.reload();
   }
 
   async updateLog(tourId: string, log: TourLog): Promise<void> {
-    await this.tourService.updateLog(tourId, log, this.authService.activeSession().username);
+    await this.tourService.updateLog(tourId, log);
     await this.reload();
   }
 
   async deleteLog(tourId: string, logId: string): Promise<void> {
-    await this.tourService.deleteLog(tourId, logId, this.authService.activeSession().username);
+    await this.tourService.deleteLog(tourId, logId);
     await this.reload();
   }
 
-  exportUrl(): string {
-    return this.tourService.exportUrl(this.authService.activeSession().username);
+  async exportAll(): Promise<void> {
+    const data = await this.tourService.exportAll();
+    const CHUNK = 100;
+    const chunks = Math.ceil(data.length / CHUNK);
+    for (let i = 0; i < chunks; i++) {
+      this.downloadJson(
+        data.slice(i * CHUNK, (i + 1) * CHUNK),
+        chunks === 1 ? 'tour-export.json' : `tour-export-${i + 1}.json`
+      );
+    }
   }
 
-  exportTourUrl(tourId: string, username: string): string {
-    return this.tourService.exportTourUrl(tourId, username);
+  async exportTour(tourId: string): Promise<void> {
+    const data = await this.tourService.exportTour(tourId);
+    this.downloadJson(data, 'tour-export.json');
+  }
+
+  private downloadJson(data: object[], filename: string): void {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   async loadWeather(tour: Tour): Promise<Weather | null> {
@@ -344,7 +365,7 @@ export class TourViewModelService {
     if (tours.length > 100) {
       throw new Error(`Die Datei enthält ${tours.length} Touren. Pro Import sind maximal 100 erlaubt.`);
     }
-    await this.tourService.importTours(this.authService.activeSession().username, tours);
+    await this.tourService.importTours(tours);
   }
 
   // localStorage helpers

@@ -97,7 +97,6 @@ export class TourFormComponent {
       route: this.fb.group({
         distance: [null, [Validators.required, Validators.min(0)]],
         durationMin: [null, [Validators.required, Validators.min(0)]],
-        routeInfo: [''],
         geometry: [[]],
       }),
       pois: this.fb.array([]),
@@ -359,7 +358,6 @@ export class TourFormComponent {
     this.tourForm.get('route')?.patchValue({
       distance: distanceKm,
       durationMin,
-      routeInfo: route ? `${route.profile}${accessible ? ' barrierefrei' : ''}` : 'Luftlinie-Schaetzung',
       geometry: route?.latLngs ?? routePoints.map((point) => [point.latitude, point.longitude]),
     }, { emitEvent: false });
     this.tourForm.get('route.distance')?.markAsDirty();

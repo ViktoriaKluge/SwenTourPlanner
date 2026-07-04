@@ -101,7 +101,6 @@ public class TourMapper {
     if (route == null) return dto;
     dto.distance = route.getDistance();
     dto.durationMin = route.getDurationMin();
-    dto.routeInfo = route.getRouteInfo();
     try {
       dto.geometry = route.getGeometryJson() == null ? new ArrayList<>() : objectMapper.readValue(route.getGeometryJson(), new TypeReference<List<List<Double>>>() {});
     } catch (JsonProcessingException ex) {
@@ -115,7 +114,6 @@ public class TourMapper {
     if (dto != null) {
       route.setDistance(dto.distance);
       route.setDurationMin(dto.durationMin);
-      route.setRouteInfo(dto.routeInfo);
       try {
         route.setGeometryJson(objectMapper.writeValueAsString(dto.geometry == null ? new ArrayList<>() : dto.geometry));
       } catch (JsonProcessingException ex) {

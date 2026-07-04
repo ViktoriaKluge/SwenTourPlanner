@@ -63,7 +63,6 @@ public class OpenRouteServiceClient {
       }
       current.setDistance(Math.round(summary.path("distance").asDouble() / 10.0) / 100.0);
       current.setDurationMin((int) Math.round(summary.path("duration").asDouble() / 60.0));
-      current.setRouteInfo("OpenRouteService " + profile);
       List<List<Double>> latLngs = new ArrayList<>();
       for (JsonNode coordinate : root.at("/features/0/geometry/coordinates")) {
         latLngs.add(Arrays.asList(coordinate.get(1).asDouble(), coordinate.get(0).asDouble()));

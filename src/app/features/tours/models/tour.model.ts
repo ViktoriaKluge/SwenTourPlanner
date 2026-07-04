@@ -26,7 +26,6 @@ export type Location = {
 export type Route = {
   distance: number;
   durationMin: number;
-  routeInfo?: string;
   geometry?: [number, number][];
 };
 

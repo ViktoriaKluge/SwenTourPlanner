@@ -135,7 +135,7 @@
 
       <div class="detail-actions">
         <button class="btn-edit" type="button" (click)="startEdit()" [disabled]="deleting()">Bearbeiten</button>
-        <a class="btn-export" [href]="exportUrl()" download="tour-export.json">Exportieren</a>
+        <button class="btn-export" type="button" (click)="exportTour()">Exportieren</button>
         <button class="btn-delete" type="button" (click)="requestDelete()" [disabled]="deleting()">Loeschen</button>
       </div>
 

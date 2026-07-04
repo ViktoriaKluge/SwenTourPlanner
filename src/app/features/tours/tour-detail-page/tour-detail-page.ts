@@ -15,10 +15,10 @@ import { Tour, Weather } from '../models/tour.model';
 export class TourDetailPageComponent {
   protected readonly state = inject(TourViewModelService);
 
-  exportUrl(): string {
+  async exportTour(): Promise<void> {
     const tour = this.selected();
-    if (!tour) return '';
-    return this.state.exportTourUrl(tour.id, tour.username);
+    if (!tour) return;
+    await this.state.exportTour(tour.id);
   }
 
   readonly selected = this.state.selectedTour;

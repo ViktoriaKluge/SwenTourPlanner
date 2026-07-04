@@ -63,25 +63,8 @@ export class HeaderComponent {
 
     async exportAll(): Promise<void> {
         this.moreOpen.set(false);
-        const url = this.tours.exportUrl();
         try {
-            const res = await fetch(url);
-            if (!res.ok) return;
-            const data: unknown[] = await res.json();
-            const CHUNK = 100;
-            const chunks = Math.ceil(data.length / CHUNK);
-            for (let i = 0; i < chunks; i++) {
-                const slice = data.slice(i * CHUNK, (i + 1) * CHUNK);
-                const blob = new Blob([JSON.stringify(slice, null, 2)], { type: 'application/json' });
-                const blobUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = blobUrl;
-                a.download = chunks === 1 ? 'tour-export.json' : `tour-export-${i + 1}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(blobUrl);
-            }
+            await this.tours.exportAll();
         } catch { /* silently ignore */ }
     }
 
