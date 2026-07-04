@@ -53,3 +53,6 @@ Thumbs.db
 
 # Local dev notes (not for repo)
 DEVNOTES.md
+
+# Local PDF docs (not for repo)
+_docs/

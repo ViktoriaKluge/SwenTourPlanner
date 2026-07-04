@@ -48,23 +48,20 @@ Checked against `semester-project.pdf`.
 - Frontend ruft Nominatim und OSRM direkt aus dem Browser auf – bewusste Entscheidung oder Optimierungspotential?
 - Welche Design-Patterns wurden verwendet?
 - Haben wir ein Logging Framework und wie funktioniert es? Was loggt es?
+- Was genau macht unser unique feature? 
+- Wie genau areiten frontend und backend zusammen?
 
 ### Was ist gefordert (Double Check)
 - Besonders: Wireframes, UML-Diagramme, Protokoll, Zeitaufzeichnung – sind diese Dokumente vollständig?
 - Geforderte Designmuster nochmals prüfen: Repository, MVVM, DTO/Mapper – gibt es noch weitere die erwartet werden?
 
-### Optimierungsoptionen
-- Was genau macht unser unique feature? 
-- Wie genau areiten frontend und backend zusammen?
-- Type Safty
-- alles mit einem Befehl starten? docker-compose
-- im Log sichtbar falls ors und osrm beide ausfallen?
 
+- ngirgendwas
+- was weicht grob von den Unterlagen ab?
 
 ### Offene Fragen
 - **Exportieren:** mit Logs?
 - **FAQ.** mit userguide und zB Berechnungen
-- **LOG:** was genau wollen wir (nicht) loggen?
 - **BruteFroce:** failed attempts tracken?
 - **PSW:** sicheres passwort?
 - **Token:** jwt?

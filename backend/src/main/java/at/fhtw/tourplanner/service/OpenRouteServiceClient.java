@@ -56,7 +56,11 @@ public class OpenRouteServiceClient {
       headers.setContentType(MediaType.APPLICATION_JSON);
       headers.set("Authorization", properties.getOpenRouteService().getApiKey());
       ResponseEntity<String> response = restTemplate.postForEntity(url, new HttpEntity<>(body, headers), String.class);
-      JsonNode root = objectMapper.readTree(response.getBody());
+      String responseBody = response.getBody();
+      if (responseBody == null || responseBody.isBlank()) {
+        throw new Exception("Leere ORS-Antwort");
+      }
+      JsonNode root = objectMapper.readTree(responseBody);
       JsonNode summary = root.at("/features/0/properties/summary");
       if (summary.isMissingNode()) {
         throw new Exception("Ungültige ORS-Antwortstruktur: summary fehlt");

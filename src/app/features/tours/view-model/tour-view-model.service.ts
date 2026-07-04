@@ -1,9 +1,9 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { TourService } from '../data-access/tour.service';
 import { AuthService } from '../../auth/services/auth.service';
-import { Tour, TourLog, Weather } from '../models/tour.model';
+import { Tour, TourLog, TransportType, Weather } from '../models/tour.model';
 
-export type ActivityFilter = 'walking' | 'running' | 'cycling';
+export type ActivityFilter = TransportType;
 export type TourListMode = 'all' | 'favorites';
 
 const PAGE_SIZE = 5;
@@ -53,7 +53,7 @@ export class TourViewModelService {
 
     return this.tourService.tours().filter((t) => {
       const byUser   = t.username === user;
-      const byFilter = filters.size === 0 || filters.has(t.transportType as ActivityFilter);
+      const byFilter = filters.size === 0 || filters.has(t.transportType);
       const byMode = this.listMode() === 'all' || t.favorite;
       const logText = t.logs.map(l => `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`).join(' ');
       const transportDE: Record<string, string> = { walking: 'wandern', running: 'laufen', cycling: 'radfahren' };
@@ -358,9 +358,11 @@ export class TourViewModelService {
     const text = await file.text();
     let tours: Tour[];
     try {
-      tours = JSON.parse(text) as Tour[];
+      const parsed: unknown = JSON.parse(text);
+      if (!Array.isArray(parsed)) throw new SyntaxError('kein Array');
+      tours = parsed as Tour[];
     } catch {
-      throw new Error('Die Datei enthaelt kein gueltiges JSON.');
+      throw new Error('Die Datei enthaelt kein gueltiges JSON-Array.');
     }
     if (tours.length > 100) {
       throw new Error(`Die Datei enthaelt ${tours.length} Touren. Pro Import sind maximal 100 erlaubt.`);

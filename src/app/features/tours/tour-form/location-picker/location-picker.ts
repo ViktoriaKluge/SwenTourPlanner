@@ -96,7 +96,8 @@ export class LocationPickerComponent implements AfterViewInit, OnDestroy {
       if (!res.ok) throw new Error(`Geocoding fehlgeschlagen: ${res.status}`);
       const results = await res.json();
       this.suggestions.set(Array.isArray(results) ? results : []);
-    } catch {
+    } catch (e) {
+      console.error('Nominatim: Geocoding fehlgeschlagen', e);
       this.suggestions.set([]);
     } finally {
       this.searching.set(false);

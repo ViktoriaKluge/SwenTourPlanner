@@ -40,24 +40,26 @@ $env:ORS_API_KEY="<your-openrouteservice-key>"
 $env:OPENWEATHER_API_KEY="<your-openweather-key>"
 ```
 
-Start PostgreSQL:
-
-```powershell
-docker compose up -d
-```
-
 ## Run
 
-Start the backend:
+Start everything with a single command (database, backend, and frontend):
 
 ```powershell
-npm run backend
+npm run start:all
 ```
 
-Start the Angular frontend with the API proxy:
+This starts PostgreSQL in the background via Docker, then runs the Spring Boot backend and the Angular frontend in parallel. Output from both processes is shown in the same terminal, prefixed with `[backend]` and `[frontend]`. Stop both with `Ctrl+C`. To also stop the database container afterwards:
 
 ```powershell
-npm start
+docker-compose stop
+```
+
+Alternatively, start each part individually:
+
+```powershell
+docker-compose up -d   # database only
+npm run backend        # backend only
+npm start              # frontend only
 ```
 
 Open `http://localhost:4200`.
