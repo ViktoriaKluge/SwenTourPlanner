@@ -81,7 +81,7 @@ export class TourDetailPageComponent {
       await this.state.deleteTour(id);
       this.confirmDeleteOpen.set(false);
     } catch {
-      this.deleteError.set('Tour konnte nicht gelöscht werden. Bitte Backend und Datenbank prüfen.');
+      this.deleteError.set('Tour konnte nicht geloescht werden. Bitte Backend und Datenbank pruefen.');
     } finally {
       this.deleting.set(false);
     }

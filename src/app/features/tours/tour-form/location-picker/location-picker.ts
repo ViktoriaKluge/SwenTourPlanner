@@ -34,7 +34,7 @@ function circleIcon(color: string): L.DivIcon {
   styleUrls: ['./location-picker.css'],
 })
 export class LocationPickerComponent implements AfterViewInit, OnDestroy {
-  readonly title   = input<string>('Standort wählen');
+  readonly title   = input<string>('Standort waehlen');
   readonly initLat = input<number | null>(null);
   readonly initLon = input<number | null>(null);
 

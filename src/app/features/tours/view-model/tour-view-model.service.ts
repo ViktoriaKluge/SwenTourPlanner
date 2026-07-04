@@ -360,10 +360,10 @@ export class TourViewModelService {
     try {
       tours = JSON.parse(text) as Tour[];
     } catch {
-      throw new Error('Die Datei enthält kein gültiges JSON.');
+      throw new Error('Die Datei enthaelt kein gueltiges JSON.');
     }
     if (tours.length > 100) {
-      throw new Error(`Die Datei enthält ${tours.length} Touren. Pro Import sind maximal 100 erlaubt.`);
+      throw new Error(`Die Datei enthaelt ${tours.length} Touren. Pro Import sind maximal 100 erlaubt.`);
     }
     await this.tourService.importTours(tours);
   }

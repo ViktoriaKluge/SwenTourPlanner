@@ -131,7 +131,7 @@
         [routeGeometry]="selected()!.route.geometry ?? []"
       />
 
-      <app-tour-log-list [tourId]="selected()!.id" [logs]="selected()!.logs" />
+      <app-tour-log-list [tourId]="selected()!.id" [logs]="selected()!.logs" [routeDistance]="selected()!.route.distance" />
 
       <div class="detail-actions">
         <button class="btn-edit" type="button" (click)="startEdit()" [disabled]="deleting()">Bearbeiten</button>

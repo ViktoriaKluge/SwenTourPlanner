@@ -11,8 +11,9 @@ import { TourLogFormComponent } from '../tour-log-form/tour-log-form';
   styleUrls: ['./tour-log-list.css'],
 })
 export class TourLogListComponent {
-  readonly tourId = input.required<string>();
-  readonly logs   = input<TourLog[]>([]);
+  readonly tourId       = input.required<string>();
+  readonly logs         = input<TourLog[]>([]);
+  readonly routeDistance = input<number>(0);
 
   readonly matchingIds = computed(() => {
     const q = this.state.searchText().trim().toLowerCase();
@@ -54,8 +55,9 @@ export class TourLogListComponent {
       }
       this.logError.set(null);
       this.closeForm();
-    } catch {
-      this.logError.set('Log konnte nicht gespeichert werden. Bitte Backend und Datenbank prüfen.');
+    } catch (err: unknown) {
+      const msg = (err as { error?: { message?: string } })?.error?.message;
+      this.logError.set(msg ?? 'Log konnte nicht gespeichert werden. Bitte Backend und Datenbank pruefen.');
     }
   }
 
@@ -64,7 +66,7 @@ export class TourLogListComponent {
       await this.state.deleteLog(this.tourId(), logId);
       this.logError.set(null);
     } catch {
-      this.logError.set('Log konnte nicht gelöscht werden. Bitte Backend und Datenbank prüfen.');
+      this.logError.set('Log konnte nicht geloescht werden. Bitte Backend und Datenbank pruefen.');
     }
   }
 

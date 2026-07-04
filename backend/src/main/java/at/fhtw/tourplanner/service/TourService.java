@@ -92,7 +92,7 @@ public class TourService {
   @Transactional
   public TourLogDto updateLog(String username, String tourId, String logId, TourLogDto dto) {
     TourLogEntity log = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
-        .orElseThrow(() -> new NotFoundException("Tour log not found"));
+        .orElseThrow(() -> new NotFoundException("Log-Eintrag nicht gefunden"));
     mapper.applyLog(dto, log, log.getTour());
     log.setId(logId);
     return mapper.logToDto(logs.save(log));
@@ -101,12 +101,12 @@ public class TourService {
   @Transactional
   public void deleteLog(String username, String tourId, String logId) {
     TourLogEntity log = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
-        .orElseThrow(() -> new NotFoundException("Tour log not found"));
+        .orElseThrow(() -> new NotFoundException("Log-Eintrag nicht gefunden"));
     logs.delete(log);
   }
 
   private TourEntity findTour(String username, String id) {
-    return tours.findByIdAndUserUsername(id, username).orElseThrow(() -> new NotFoundException("Tour not found"));
+    return tours.findByIdAndUserUsername(id, username).orElseThrow(() -> new NotFoundException("Tour nicht gefunden"));
   }
 
   private boolean routeRelevantFieldsChanged(TourEntity existing, TourDto incoming) {

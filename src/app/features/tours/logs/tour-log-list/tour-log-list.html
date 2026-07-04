@@ -19,6 +19,7 @@
   @if (addingLog() || editingLog()) {
     <app-tour-log-form
       [log]="editingLog()"
+      [routeDistance]="routeDistance()"
       (saved)="saveLog($event)"
       (cancelled)="closeForm()"
     />

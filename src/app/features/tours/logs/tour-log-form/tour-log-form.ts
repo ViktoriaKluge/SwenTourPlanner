@@ -1,5 +1,5 @@
 import { Component, effect, input, output, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TourLog } from '../../models/tour.model';
 
 @Component({
@@ -10,7 +10,8 @@ import { TourLog } from '../../models/tour.model';
   styleUrls: ['./tour-log-form.css'],
 })
 export class TourLogFormComponent {
-  readonly log = input<TourLog | null>(null);
+  readonly log           = input<TourLog | null>(null);
+  readonly routeDistance = input<number>(0);
 
   readonly saved     = output<TourLog>();
   readonly cancelled = output<void>();
@@ -20,23 +21,27 @@ export class TourLogFormComponent {
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      date:       [this.todayStr(), Validators.required],
-      comment:    ['', [Validators.required, Validators.minLength(3)]],
-      difficulty: [3,  [Validators.required, Validators.min(1), Validators.max(5)]],
-      totalTime: [0, [Validators.required, Validators.min(0)]],
-      rating:     [3,  [Validators.required, Validators.min(1), Validators.max(5)]],
+      date:          [this.todayStr(), Validators.required],
+      comment:       ['', [Validators.required, Validators.minLength(3)]],
+      difficulty:    [3,  [Validators.required, Validators.min(1), Validators.max(5)]],
+      totalDistance: [0,  [Validators.required, Validators.min(0.1), Validators.max(500)]],
+      totalTime:     [0,  [Validators.required, Validators.min(1),   Validators.max(1440)]],
+      rating:        [3,  [Validators.required, Validators.min(1), Validators.max(5)]],
     });
 
     effect(() => {
       const l = this.log();
       if (l) {
         this.form.patchValue({
-          date:       new Date(l.date).toISOString().split('T')[0],
-          comment:    l.comment,
-          difficulty: l.difficulty,
-          totalTime: l.totalTime,
-          rating:     l.rating,
+          date:          new Date(l.date).toISOString().split('T')[0],
+          comment:       l.comment,
+          difficulty:    l.difficulty,
+          totalDistance: l.totalDistance,
+          totalTime:     l.totalTime,
+          rating:        l.rating,
         });
+      } else {
+        this.form.patchValue({ totalDistance: this.routeDistance() });
       }
     });
   }
@@ -70,7 +75,7 @@ export class TourLogFormComponent {
       date:       new Date(v.date),
       comment:    v.comment,
       difficulty: +v.difficulty,
-      totalDistance: this.log()?.totalDistance ?? 0,
+      totalDistance: +v.totalDistance,
       totalTime: +v.totalTime,
       rating:     +v.rating,
     });

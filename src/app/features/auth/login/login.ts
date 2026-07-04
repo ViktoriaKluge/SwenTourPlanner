@@ -20,7 +20,7 @@ export class LoginComponent {
     constructor(private builder: FormBuilder) {
         this.loginForm = this.builder.group({
             username: ['', [Validators.required, Validators.minLength(2)]],
-            password: ['', Validators.required]
+            password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]]
         });
     }
 
@@ -43,9 +43,10 @@ export class LoginComponent {
                     this.error = 'Backend nicht erreichbar. Starte zuerst die Spring-Boot-App in IntelliJ.';
                     return;
                 }
-                this.error = this.registerMode
+                const backendMsg = err?.error?.message;
+                this.error = backendMsg ?? (this.registerMode
                     ? 'Registrierung fehlgeschlagen. Username ist eventuell bereits vergeben.'
-                    : 'Login fehlgeschlagen. Bitte Username und Passwort prüfen.';
+                    : 'Login fehlgeschlagen. Bitte Username und Passwort pruefen.');
             } finally {
                 this.busy.set(false);
                 this.loginForm.enable();

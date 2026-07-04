@@ -10,7 +10,7 @@ import java.util.List;
 public class TourDto {
   public String id;
   public String username;
-  @NotBlank
+  @NotBlank(message = "Tourname darf nicht leer sein")
   public String title;
   public TransportType transportType;
   public boolean accessible;

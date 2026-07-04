@@ -205,7 +205,7 @@ public class WeatherService {
   private WeatherDto failedWeather(String message, String detail) {
     log.warn("OpenWeather request failed: {}", detail);
     WeatherDto dto = new WeatherDto();
-    dto.providerConfigured = true;
+    dto.providerConfigured = false;
     dto.message = message + (detail == null || detail.isEmpty() ? "" : " " + detail);
     dto.clothingAdvice = "Bitte Wetter manuell pruefen.";
     return dto;
@@ -213,10 +213,12 @@ public class WeatherService {
 
   private String describeWeatherError(Exception ex) {
     if (ex instanceof HttpStatusCodeException) {
-      HttpStatusCodeException http = (HttpStatusCodeException) ex;
-      return "OpenWeather meldet " + http.getStatusCode().value() + ".";
+      int status = ((HttpStatusCodeException) ex).getStatusCode().value();
+      if (status == 401 || status == 403) return "API-Key ungueltig oder abgelaufen.";
+      if (status == 429)                  return "Anfragelimit beim Wetteranbieter erreicht.";
+      if (status >= 500)                  return "Wetteranbieter voruebergehend nicht erreichbar.";
     }
-    return ex.getMessage();
+    return "Verbindung zum Wetteranbieter fehlgeschlagen.";
   }
 
   private String normalizeBaseUrl(String baseUrl) {

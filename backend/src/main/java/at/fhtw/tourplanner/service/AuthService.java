@@ -32,13 +32,13 @@ public class AuthService {
   public UserEntity login(String username, String password) {
     UserEntity user = find(username);
     if (!encoder.matches(password, user.getPasswordHash())) {
-      throw new InvalidCredentialsException("Ungültige Anmeldedaten");
+      throw new InvalidCredentialsException("Ungueltige Anmeldedaten");
     }
     log.info("User {} logged in", username);
     return user;
   }
 
   public UserEntity find(String username) {
-    return users.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
+    return users.findByUsername(username).orElseThrow(() -> new NotFoundException("Benutzer nicht gefunden"));
   }
 }
