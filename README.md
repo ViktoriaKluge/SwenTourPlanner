@@ -16,9 +16,39 @@ Two-tier Tour Planner implementation for the semester project:
 ## Prerequisites
 
 - Node.js and npm
-- Java 8
-- Maven
-- Docker for PostgreSQL (optional)
+- JDK 17 or newer (project compiles with `java.version=1.8` target, but is built/run with a modern JDK; JDK 21 LTS was used for this setup)
+- Maven (no `mvnw` wrapper in this repo, so a global `mvn` install is required)
+- Docker Desktop, for PostgreSQL (optional, only needed to run against Postgres instead of H2)
+
+### First-time setup (Windows)
+
+If `java` and `mvn` are not yet available in a terminal, set them up once:
+
+1. **JDK**: install a JDK (e.g. [Eclipse Temurin 21](https://adoptium.net/)) or reuse one already on disk (IDEs like IntelliJ often keep JDKs under `%USERPROFILE%\.jdks\`).
+2. **Maven**: download the binary zip from the [official Maven download page](https://maven.apache.org/download.cgi), extract it somewhere permanent, e.g. `C:\Users\<you>\tools\apache-maven-<version>`.
+3. **Set environment variables** (User scope), then add both `bin` folders to `PATH`:
+
+   ```powershell
+   [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Users\<you>\.jdks\temurin-21.0.8", "User")
+   [Environment]::SetEnvironmentVariable("MAVEN_HOME", "C:\Users\<you>\tools\apache-maven-3.9.16", "User")
+
+   $oldPath = [Environment]::GetEnvironmentVariable("PATH", "User")
+   $newPath = "$oldPath;$env:JAVA_HOME\bin;$env:MAVEN_HOME\bin"
+   [Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
+   ```
+
+   Restart the terminal/VSCode afterwards so the new `PATH` is picked up. Verify with `java -version` and `mvn -version`.
+4. **Docker Desktop**: install from [docker.com](https://www.docker.com/products/docker-desktop/) and make sure it's running (`docker info`) before using `docker-compose`.
+
+### Download dependencies
+
+Once the tools above are on `PATH`, fetch all project dependencies:
+
+```powershell
+npm ci                                    # frontend (Angular, Bootstrap, Leaflet, ...)
+mvn -f backend/pom.xml dependency:resolve # backend (Spring Boot, java-jwt, PostgreSQL/H2 drivers, ...)
+docker pull postgres:16                   # DB image used by docker-compose.yml
+```
 
 ## Configuration
 
