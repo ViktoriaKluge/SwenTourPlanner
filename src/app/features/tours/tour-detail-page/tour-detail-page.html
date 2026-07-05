@@ -7,9 +7,14 @@
       <div class="detail-header">
         <div>
           <h2 class="detail-title">{{ selected()!.title }}</h2>
-          <span class="category-badge category-{{ selected()!.category }}">
-            {{ selected()!.category }}
-          </span>
+          <div class="detail-badges">
+            <span class="category-badge transport-{{ selected()!.transportType }}">
+              {{ selected()!.transportType }}
+            </span>
+            @if (selected()!.accessible) {
+              <span class="category-badge accessible-badge" aria-label="Barrierefrei">♿ Barrierefrei</span>
+            }
+          </div>
         </div>
         <div class="detail-header-actions">
           <button
@@ -50,6 +55,13 @@
           <span class="info-unit">Logs</span>
         </div>
       </div>
+
+      @if (selected()!.childFriendliness) {
+        <div class="info-row">
+          <span class="info-label">Kinderfreundlichkeit</span>
+          <span class="info-value">{{ selected()!.childFriendliness }}</span>
+        </div>
+      }
 
       <div class="info-row">
         <span class="info-label">Startpunkt</span>
@@ -119,10 +131,11 @@
         [routeGeometry]="selected()!.route.geometry ?? []"
       />
 
-      <app-tour-log-list [tourId]="selected()!.id" [logs]="selected()!.logs" />
+      <app-tour-log-list [tourId]="selected()!.id" [logs]="selected()!.logs" [routeDistance]="selected()!.route.distance" />
 
       <div class="detail-actions">
         <button class="btn-edit" type="button" (click)="startEdit()" [disabled]="deleting()">Bearbeiten</button>
+        <button class="btn-export" type="button" (click)="exportTour()">Exportieren</button>
         <button class="btn-delete" type="button" (click)="requestDelete()" [disabled]="deleting()">Loeschen</button>
       </div>
 

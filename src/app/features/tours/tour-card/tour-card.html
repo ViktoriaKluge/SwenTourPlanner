@@ -5,12 +5,15 @@
   (click)="choose()"
 >
   <div class="card-top">
-    <div class="card-icon category-{{ tour.category }}">{{ meta.icon }}</div>
+    <div class="card-icon transport-{{ tour.transportType }}">{{ meta.icon }}</div>
     <div class="card-badges">
       @if (tour.favorite) {
         <span class="favorite-chip" aria-label="Favorit">★</span>
       }
-      <span class="card-tag category-{{ tour.category }}">{{ meta.label }}</span>
+      @if (tour.accessible) {
+        <span class="card-tag accessible-tag" aria-label="Barrierefrei">♿ Barrierefrei</span>
+      }
+      <span class="card-tag transport-{{ tour.transportType }}">{{ meta.label }}</span>
     </div>
   </div>
 
@@ -23,5 +26,10 @@
   <div class="card-stats">
     <span class="card-stat">{{ tour.route.distance }} km</span>
     <span class="card-stat">{{ tour.route.durationMin }} Min.</span>
+    <span class="card-stat">{{ tour.logs.length }} {{ tour.logs.length === 1 ? 'Log' : 'Logs' }}</span>
   </div>
+
+  @if (matchedLogCount > 0) {
+    <div class="log-match-hint">📓 Treffer in {{ matchedLogCount }} {{ matchedLogCount === 1 ? 'Log' : 'Logs' }}</div>
+  }
 </button>

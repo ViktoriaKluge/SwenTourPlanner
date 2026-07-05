@@ -57,6 +57,20 @@
   background: #f5f7ff;
 }
 
+.log-entry--match {
+  border-color: #0f766e;
+  background: #f0fdf9;
+}
+
+.log-match-summary {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0f766e;
+  background: #ccfbf1;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+}
+
 .log-entry-header {
   display: flex;
   justify-content: space-between;
@@ -129,4 +143,14 @@
   background: #fdf2f8;
   color: #9d174d;
   letter-spacing: 0.05em;
+}
+
+.log-error {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
 }

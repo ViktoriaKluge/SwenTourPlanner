@@ -34,7 +34,7 @@ function circleIcon(color: string): L.DivIcon {
   styleUrls: ['./location-picker.css'],
 })
 export class LocationPickerComponent implements AfterViewInit, OnDestroy {
-  readonly title   = input<string>('Standort wählen');
+  readonly title   = input<string>('Standort waehlen');
   readonly initLat = input<number | null>(null);
   readonly initLon = input<number | null>(null);
 
@@ -94,8 +94,10 @@ export class LocationPickerComponent implements AfterViewInit, OnDestroy {
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=6&accept-language=de`;
       const res  = await fetch(url);
       if (!res.ok) throw new Error(`Geocoding fehlgeschlagen: ${res.status}`);
-      this.suggestions.set(await res.json());
-    } catch {
+      const results = await res.json();
+      this.suggestions.set(Array.isArray(results) ? results : []);
+    } catch (e) {
+      console.error('Nominatim: Geocoding fehlgeschlagen', e);
       this.suggestions.set([]);
     } finally {
       this.searching.set(false);

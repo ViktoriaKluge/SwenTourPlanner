@@ -1,4 +1,4 @@
-export type Section = 'home' | 'about' | 'login' | 'addTour';
+export type Section = 'home' | 'about' | 'faq' | 'login' | 'addTour';
 
 export type Session = {
   loggedIn: boolean;

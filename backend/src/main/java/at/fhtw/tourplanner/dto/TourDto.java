@@ -1,6 +1,5 @@
 package at.fhtw.tourplanner.dto;
 
-import at.fhtw.tourplanner.model.Category;
 import at.fhtw.tourplanner.model.TransportType;
 
 import javax.validation.Valid;
@@ -11,9 +10,8 @@ import java.util.List;
 public class TourDto {
   public String id;
   public String username;
-  @NotBlank
+  @NotBlank(message = "Tourname darf nicht leer sein")
   public String title;
-  public Category category;
   public TransportType transportType;
   public boolean accessible;
   public boolean favorite;
@@ -23,7 +21,6 @@ public class TourDto {
   @Valid
   public LocationDto endPoint;
   public List<LocationDto> poi = new ArrayList<>();
-  public String image;
   @Valid
   public RouteDto route;
   public List<TourLogDto> logs = new ArrayList<>();

@@ -3,7 +3,6 @@ import { TourViewModelService } from '../view-model/tour-view-model.service';
 import { TourFormComponent } from '../tour-form/tour-form';
 import { TourMapComponent } from '../tour-map/tour-map';
 import { TourLogListComponent } from '../logs/tour-log-list/tour-log-list';
-import { TourService } from '../data-access/tour.service';
 import { Tour, Weather } from '../models/tour.model';
 
 @Component({
@@ -15,7 +14,12 @@ import { Tour, Weather } from '../models/tour.model';
 })
 export class TourDetailPageComponent {
   protected readonly state = inject(TourViewModelService);
-  private readonly tourService = inject(TourService);
+
+  async exportTour(): Promise<void> {
+    const tour = this.selected();
+    if (!tour) return;
+    await this.state.exportTour(tour.id);
+  }
 
   readonly selected = this.state.selectedTour;
   readonly editing  = signal(false);
@@ -77,7 +81,7 @@ export class TourDetailPageComponent {
       await this.state.deleteTour(id);
       this.confirmDeleteOpen.set(false);
     } catch {
-      this.deleteError.set('Tour konnte nicht gelöscht werden. Bitte Backend und Datenbank prüfen.');
+      this.deleteError.set('Tour konnte nicht geloescht werden. Bitte Backend und Datenbank pruefen.');
     } finally {
       this.deleting.set(false);
     }
@@ -142,7 +146,7 @@ export class TourDetailPageComponent {
   private async loadWeather(tour: Tour): Promise<void> {
     this.weatherLoading.set(true);
     try {
-      this.weather.set(await this.tourService.loadWeather(tour));
+      this.weather.set(await this.state.loadWeather(tour));
     } catch {
       this.weatherError.set('Wetterdaten konnten nicht geladen werden.');
     } finally {

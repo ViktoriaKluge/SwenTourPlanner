@@ -2,6 +2,8 @@ package at.fhtw.tourplanner.service;
 
 import at.fhtw.tourplanner.model.UserEntity;
 import at.fhtw.tourplanner.repo.UserRepository;
+import at.fhtw.tourplanner.util.BadRequestException;
+import at.fhtw.tourplanner.util.InvalidCredentialsException;
 import at.fhtw.tourplanner.util.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,10 @@ public class AuthService {
   }
 
   public UserEntity register(String username, String password) {
-    if (users.existsByUsername(username)) throw new IllegalArgumentException("Username already exists");
+    if (users.existsByUsername(username)) {
+      log.warn("Registration failed, username {} already exists", username);
+      throw new BadRequestException("Username bereits vergeben");
+    }
     UserEntity user = new UserEntity();
     user.setUsername(username);
     user.setPasswordHash(encoder.encode(password));
@@ -30,13 +35,17 @@ public class AuthService {
   public UserEntity login(String username, String password) {
     UserEntity user = find(username);
     if (!encoder.matches(password, user.getPasswordHash())) {
-      throw new IllegalArgumentException("Invalid credentials");
+      log.warn("Failed login attempt for user {} (wrong password)", username);
+      throw new InvalidCredentialsException("Ungueltige Anmeldedaten");
     }
     log.info("User {} logged in", username);
     return user;
   }
 
   public UserEntity find(String username) {
-    return users.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
+    return users.findByUsername(username).orElseThrow(() -> {
+      log.warn("User {} not found", username);
+      return new NotFoundException("Benutzer nicht gefunden");
+    });
   }
 }

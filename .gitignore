@@ -46,3 +46,13 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Local secrets
+.env
+.env.local
+
+# Local dev notes (not for repo)
+DEVNOTES.md
+
+# Local PDF docs (not for repo)
+_docs/

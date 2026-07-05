@@ -8,6 +8,10 @@
     <app-about></app-about>
   }
 
+  @if (session().sections.includes('faq')) {
+    <app-faq></app-faq>
+  }
+
   @if (session().sections.includes('login')) {
     <app-login></app-login>
   }

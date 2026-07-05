@@ -43,6 +43,11 @@ public class TourService {
   }
 
   @Transactional(readOnly = true)
+  public TourDto get(String username, String id) {
+    return mapper.toDto(findTour(username, id));
+  }
+
+  @Transactional(readOnly = true)
   public List<TourDto> search(String username, String query) {
     return tours.findByUserUsernameOrderByTitleAsc(username).stream()
         .filter(tour -> search.matches(tour, query))
@@ -54,7 +59,7 @@ public class TourService {
   public TourDto create(String username, TourDto dto) {
     UserEntity user = auth.find(username);
     TourEntity entity = mapper.apply(dto, new TourEntity(), user);
-    entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getTransportType(), entity.isAccessible()));
+    entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getPoi(), entity.getTransportType(), entity.isAccessible()));
     log.info("Creating tour {} for {}", entity.getTitle(), username);
     return mapper.toDto(tours.save(entity));
   }
@@ -66,7 +71,7 @@ public class TourService {
     mapper.apply(dto, entity, entity.getUser());
     entity.setId(id);
     if (routeNeedsRefresh) {
-      entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getTransportType(), entity.isAccessible()));
+      entity.setRoute(routeClient.enrich(entity.getRoute(), entity.getStartPoint(), entity.getEndPoint(), entity.getPoi(), entity.getTransportType(), entity.isAccessible()));
     }
     log.info("Updating tour {} for {}", id, username);
     return mapper.toDto(tours.save(entity));
@@ -81,33 +86,40 @@ public class TourService {
   public TourLogDto addLog(String username, String tourId, TourLogDto dto) {
     TourEntity tour = findTour(username, tourId);
     TourLogEntity log = mapper.applyLog(dto, new TourLogEntity(), tour);
-    tour.getLogs().add(log);
     return mapper.logToDto(logs.save(log));
   }
 
   @Transactional
   public TourLogDto updateLog(String username, String tourId, String logId, TourLogDto dto) {
-    TourLogEntity log = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
-        .orElseThrow(() -> new NotFoundException("Tour log not found"));
-    mapper.applyLog(dto, log, log.getTour());
-    log.setId(logId);
-    return mapper.logToDto(logs.save(log));
+    TourLogEntity entry = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
+        .orElseThrow(() -> {
+          log.warn("Log {} not found for tour {} and user {}", logId, tourId, username);
+          return new NotFoundException("Log-Eintrag nicht gefunden");
+        });
+    mapper.applyLog(dto, entry, entry.getTour());
+    entry.setId(logId);
+    return mapper.logToDto(logs.save(entry));
   }
 
   @Transactional
   public void deleteLog(String username, String tourId, String logId) {
-    TourLogEntity log = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
-        .orElseThrow(() -> new NotFoundException("Tour log not found"));
-    logs.delete(log);
+    TourLogEntity entry = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
+        .orElseThrow(() -> {
+          log.warn("Log {} not found for tour {} and user {}", logId, tourId, username);
+          return new NotFoundException("Log-Eintrag nicht gefunden");
+        });
+    logs.delete(entry);
   }
 
   private TourEntity findTour(String username, String id) {
-    return tours.findByIdAndUserUsername(id, username).orElseThrow(() -> new NotFoundException("Tour not found"));
+    return tours.findByIdAndUserUsername(id, username).orElseThrow(() -> {
+      log.warn("Tour {} not found for user {}", id, username);
+      return new NotFoundException("Tour nicht gefunden");
+    });
   }
 
   private boolean routeRelevantFieldsChanged(TourEntity existing, TourDto incoming) {
     if (incoming == null) return false;
-    if (incoming.category != null && incoming.category != existing.getCategory()) return true;
     if (incoming.transportType != null && incoming.transportType != existing.getTransportType()) return true;
     if (incoming.accessible != existing.isAccessible()) return true;
     if (locationChanged(existing.getStartPoint(), incoming.startPoint)) return true;

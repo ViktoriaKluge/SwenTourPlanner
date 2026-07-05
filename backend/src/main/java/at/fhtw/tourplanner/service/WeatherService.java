@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
@@ -23,7 +24,14 @@ public class WeatherService {
 
   private final AppProperties properties;
   private final ObjectMapper objectMapper;
-  private final RestTemplate restTemplate = new RestTemplate();
+  private final RestTemplate restTemplate = buildRestTemplate();
+
+  private static RestTemplate buildRestTemplate() {
+    SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+    f.setConnectTimeout(5_000);
+    f.setReadTimeout(10_000);
+    return new RestTemplate(f);
+  }
 
   public WeatherService(AppProperties properties, ObjectMapper objectMapper) {
     this.properties = properties;
@@ -197,7 +205,7 @@ public class WeatherService {
   private WeatherDto failedWeather(String message, String detail) {
     log.warn("OpenWeather request failed: {}", detail);
     WeatherDto dto = new WeatherDto();
-    dto.providerConfigured = true;
+    dto.providerConfigured = false;
     dto.message = message + (detail == null || detail.isEmpty() ? "" : " " + detail);
     dto.clothingAdvice = "Bitte Wetter manuell pruefen.";
     return dto;
@@ -205,10 +213,12 @@ public class WeatherService {
 
   private String describeWeatherError(Exception ex) {
     if (ex instanceof HttpStatusCodeException) {
-      HttpStatusCodeException http = (HttpStatusCodeException) ex;
-      return "OpenWeather meldet " + http.getStatusCode().value() + ".";
+      int status = ((HttpStatusCodeException) ex).getStatusCode().value();
+      if (status == 401 || status == 403) return "API-Key ungueltig oder abgelaufen.";
+      if (status == 429)                  return "Anfragelimit beim Wetteranbieter erreicht.";
+      if (status >= 500)                  return "Wetteranbieter voruebergehend nicht erreichbar.";
     }
-    return ex.getMessage();
+    return "Verbindung zum Wetteranbieter fehlgeschlagen.";
   }
 
   private String normalizeBaseUrl(String baseUrl) {
@@ -229,7 +239,7 @@ public class WeatherService {
     return Math.round(value * 10000.0) / 10000.0;
   }
 
-  private String clothingAdvice(double feelsLike, double windKmh, String description) {
+  String clothingAdvice(double feelsLike, double windKmh, String description) {
     String lower = description == null ? "" : description.toLowerCase();
     boolean rain = lower.contains("regen") || lower.contains("rain") || lower.contains("schauer");
     StringBuilder advice = new StringBuilder();

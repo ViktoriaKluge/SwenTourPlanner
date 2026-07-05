@@ -29,7 +29,7 @@ export class HeaderComponent {
     goTo(section: Section): void {
         this.moreOpen.set(false);
         if (section === 'home') {
-            this.tours.goHome();
+            this.tours.resetAll();
         }
         this.auth.setActiveSection(section);
     }
@@ -61,15 +61,22 @@ export class HeaderComponent {
         this.moreOpen.set(false);
     }
 
-    exportUrl(): string {
-        return this.tours.exportUrl();
+    async exportAll(): Promise<void> {
+        this.moreOpen.set(false);
+        try {
+            await this.tours.exportAll();
+        } catch { /* silently ignore */ }
     }
 
     async importFile(event: Event): Promise<void> {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
         if (file) {
-            await this.tours.importTours(file);
+            try {
+                await this.tours.importTours(file);
+            } catch (e: unknown) {
+                alert(e instanceof Error ? e.message : 'Import fehlgeschlagen.');
+            }
         }
         input.value = '';
         this.moreOpen.set(false);

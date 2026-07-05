@@ -3,12 +3,14 @@ package at.fhtw.tourplanner.service;
 import at.fhtw.tourplanner.model.*;
 import at.fhtw.tourplanner.dto.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -27,7 +29,6 @@ public class TourMapper {
     dto.id = entity.getId();
     dto.username = entity.getUser().getUsername();
     dto.title = entity.getTitle();
-    dto.category = entity.getCategory();
     dto.transportType = entity.getTransportType();
     dto.accessible = entity.isAccessible();
     dto.favorite = entity.isFavorite();
@@ -35,7 +36,6 @@ public class TourMapper {
     dto.startPoint = locationToDto(entity.getStartPoint());
     dto.endPoint = locationToDto(entity.getEndPoint());
     dto.poi = entity.getPoi().stream().map(this::locationToDto).collect(Collectors.toList());
-    dto.image = entity.getImage();
     dto.route = routeToDto(entity.getRoute());
     dto.logs = entity.getLogs().stream().map(this::logToDto).collect(Collectors.toList());
     dto.popularity = stats.popularity(entity);
@@ -47,15 +47,13 @@ public class TourMapper {
     entity.setId(dto.id == null || dto.id.trim().isEmpty() ? UUID.randomUUID().toString() : dto.id);
     entity.setUser(user);
     entity.setTitle(dto.title);
-    entity.setCategory(dto.category == null ? Category.hike : dto.category);
-    entity.setTransportType(dto.transportType == null ? transportTypeFromCategory(entity.getCategory()) : dto.transportType);
+    entity.setTransportType(dto.transportType == null ? TransportType.walking : dto.transportType);
     entity.setAccessible(dto.accessible);
     entity.setFavorite(dto.favorite);
     entity.setDescription(dto.description == null ? "" : dto.description);
     entity.setStartPoint(locationFromDto(dto.startPoint));
     entity.setEndPoint(locationFromDto(dto.endPoint));
     entity.setPoi(dto.poi == null ? new ArrayList<>() : dto.poi.stream().map(this::locationFromDto).collect(Collectors.toList()));
-    entity.setImage(dto.image == null || dto.image.trim().isEmpty() ? "tba" : dto.image);
     entity.setRoute(routeFromDto(dto.route));
     return entity;
   }
@@ -85,6 +83,7 @@ public class TourMapper {
   }
 
   private LocationDto locationToDto(LocationEmbeddable loc) {
+    if (loc == null) return new LocationDto();
     LocationDto dto = new LocationDto();
     dto.name = loc.getName();
     dto.latitude = loc.getLatitude();
@@ -93,16 +92,17 @@ public class TourMapper {
   }
 
   private LocationEmbeddable locationFromDto(LocationDto dto) {
+    if (dto == null) return new LocationEmbeddable("", 0, 0);
     return new LocationEmbeddable(dto.name, dto.latitude, dto.longitude);
   }
 
   private RouteDto routeToDto(RouteEmbeddable route) {
     RouteDto dto = new RouteDto();
+    if (route == null) return dto;
     dto.distance = route.getDistance();
     dto.durationMin = route.getDurationMin();
-    dto.routeInfo = route.getRouteInfo();
     try {
-      dto.geometry = route.getGeometryJson() == null ? new ArrayList<>() : objectMapper.readValue(route.getGeometryJson(), ArrayList.class);
+      dto.geometry = route.getGeometryJson() == null ? new ArrayList<>() : objectMapper.readValue(route.getGeometryJson(), new TypeReference<List<List<Double>>>() {});
     } catch (JsonProcessingException ex) {
       dto.geometry = new ArrayList<>();
     }
@@ -114,7 +114,6 @@ public class TourMapper {
     if (dto != null) {
       route.setDistance(dto.distance);
       route.setDurationMin(dto.durationMin);
-      route.setRouteInfo(dto.routeInfo);
       try {
         route.setGeometryJson(objectMapper.writeValueAsString(dto.geometry == null ? new ArrayList<>() : dto.geometry));
       } catch (JsonProcessingException ex) {
@@ -122,12 +121,6 @@ public class TourMapper {
       }
     }
     return route;
-  }
-
-  private TransportType transportTypeFromCategory(Category category) {
-    if (category == Category.bike) return TransportType.cycling;
-    if (category == Category.run) return TransportType.running;
-    return TransportType.walking;
   }
 
   private LocalDateTime parseDate(String value) {

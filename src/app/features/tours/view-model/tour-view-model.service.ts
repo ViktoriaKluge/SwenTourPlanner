@@ -1,9 +1,9 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { TourService } from '../data-access/tour.service';
 import { AuthService } from '../../auth/services/auth.service';
-import { Tour, TourLog } from '../models/tour.model';
+import { Tour, TourLog, TransportType, Weather } from '../models/tour.model';
 
-export type ActivityFilter = 'hike' | 'run' | 'bike';
+export type ActivityFilter = TransportType;
 export type TourListMode = 'all' | 'favorites';
 
 const PAGE_SIZE = 5;
@@ -20,7 +20,7 @@ export class TourViewModelService {
   readonly searchInput = signal(localStorage.getItem(SEARCH_KEY) ?? '');
   readonly searchText  = signal(localStorage.getItem(SEARCH_KEY) ?? '');
 
-  // Category filters
+  // Transport type filters
   readonly activeFilters = signal<Set<ActivityFilter>>(
     new Set(this.restoreFilters())
   );
@@ -53,11 +53,20 @@ export class TourViewModelService {
 
     return this.tourService.tours().filter((t) => {
       const byUser   = t.username === user;
-      const byFilter = filters.size === 0 || filters.has(t.category as ActivityFilter);
+      const byFilter = filters.size === 0 || filters.has(t.transportType);
       const byMode = this.listMode() === 'all' || t.favorite;
-      const bySearch = !q
-        ? true
-        : t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
+      const logText = t.logs.map(l => `${l.comment} ${l.difficulty} ${l.rating} ${l.totalDistance} ${l.totalTime}`).join(' ');
+      const transportDE: Record<string, string> = { walking: 'wandern', running: 'laufen', cycling: 'radfahren' };
+      const poiText = t.poi.map(p => p.name).join(' ');
+      const haystack = [
+        t.title, t.description, t.transportType, transportDE[t.transportType] ?? '',
+        t.childFriendliness,
+        t.accessible ? 'barrierefrei wheelchair accessible' : '',
+        t.startPoint.name, t.endPoint.name, poiText,
+        t.route.distance, t.route.durationMin,
+        logText,
+      ].join(' ').toLowerCase();
+      const bySearch = !q ? true : haystack.includes(q);
       return byUser && byFilter && byMode && bySearch;
     });
   });
@@ -134,7 +143,8 @@ export class TourViewModelService {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.debounceTimer = setTimeout(() => {
       this.searchText.set(text);
-      this.pageSize.set(PAGE_SIZE);
+      // Reset to page size only when starting a new search; clearing shows all
+      this.pageSize.set(text.trim() ? PAGE_SIZE : Number.MAX_SAFE_INTEGER);
       this.deselectIfGone();
       void this.reload();
     }, 700);
@@ -144,8 +154,15 @@ export class TourViewModelService {
     if (this.debounceTimer) clearTimeout(this.debounceTimer);
     this.searchInput.set('');
     this.searchText.set('');
-    this.pageSize.set(PAGE_SIZE);
+    this.pageSize.set(Number.MAX_SAFE_INTEGER);
     void this.reload();
+  }
+
+  resetAll(): void {
+    this.goHome();
+    this.setListMode('all');
+    this.activeFilters.set(new Set());
+    this.clearSearch();
   }
 
   // Filters
@@ -262,7 +279,7 @@ export class TourViewModelService {
     this.loading.set(true);
     this.error.set(null);
     try {
-      await this.tourService.load(user, this.searchText());
+      await this.tourService.load(this.searchText());
     } catch {
       this.tourService.tours.set([]);
     } finally {
@@ -271,8 +288,9 @@ export class TourViewModelService {
   }
 
   async addTour(tour: Tour): Promise<void> {
-    await this.tourService.add(tour);
+    const saved = await this.tourService.add(tour);
     this.isAddingTour.set(false);
+    if (saved?.id) this.selectedTourId.set(saved.id);
   }
 
   async updateTour(tour: Tour): Promise<void> {
@@ -284,33 +302,72 @@ export class TourViewModelService {
   }
 
   async deleteTour(id: string): Promise<void> {
-    await this.tourService.delete(id, this.authService.activeSession().username);
+    await this.tourService.delete(id);
     this.selectedTourId.set(null);
   }
 
   async addLog(tourId: string, log: TourLog): Promise<void> {
-    await this.tourService.addLog(tourId, log, this.authService.activeSession().username);
+    await this.tourService.addLog(tourId, log);
     await this.reload();
   }
 
   async updateLog(tourId: string, log: TourLog): Promise<void> {
-    await this.tourService.updateLog(tourId, log, this.authService.activeSession().username);
+    await this.tourService.updateLog(tourId, log);
     await this.reload();
   }
 
   async deleteLog(tourId: string, logId: string): Promise<void> {
-    await this.tourService.deleteLog(tourId, logId, this.authService.activeSession().username);
+    await this.tourService.deleteLog(tourId, logId);
     await this.reload();
   }
 
-  exportUrl(): string {
-    return this.tourService.exportUrl(this.authService.activeSession().username);
+  async exportAll(): Promise<void> {
+    const data = await this.tourService.exportAll();
+    const CHUNK = 100;
+    const chunks = Math.ceil(data.length / CHUNK);
+    for (let i = 0; i < chunks; i++) {
+      this.downloadJson(
+        data.slice(i * CHUNK, (i + 1) * CHUNK),
+        chunks === 1 ? 'tour-export.json' : `tour-export-${i + 1}.json`
+      );
+    }
+  }
+
+  async exportTour(tourId: string): Promise<void> {
+    const data = await this.tourService.exportTour(tourId);
+    this.downloadJson(data, 'tour-export.json');
+  }
+
+  private downloadJson(data: object[], filename: string): void {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  async loadWeather(tour: Tour): Promise<Weather | null> {
+    return this.tourService.loadWeather(tour);
   }
 
   async importTours(file: File): Promise<void> {
     const text = await file.text();
-    const tours = JSON.parse(text) as Tour[];
-    await this.tourService.importTours(this.authService.activeSession().username, tours);
+    let tours: Tour[];
+    try {
+      const parsed: unknown = JSON.parse(text);
+      if (!Array.isArray(parsed)) throw new SyntaxError('kein Array');
+      tours = parsed as Tour[];
+    } catch {
+      throw new Error('Die Datei enthaelt kein gueltiges JSON-Array.');
+    }
+    if (tours.length > 100) {
+      throw new Error(`Die Datei enthaelt ${tours.length} Touren. Pro Import sind maximal 100 erlaubt.`);
+    }
+    await this.tourService.importTours(tours);
   }
 
   // localStorage helpers

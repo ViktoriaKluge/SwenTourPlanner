@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot Backend",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/backend",
+            "mainClass": "at.fhtw.tourplanner.TourPlannerApplication",
+            "projectName": "tourplanner",
+            "envFile": "${workspaceFolder}/backend/.env"
+        }
+    ]
+}

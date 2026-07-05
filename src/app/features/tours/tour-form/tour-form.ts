@@ -81,10 +81,9 @@ export class TourFormComponent {
   constructor(private fb: FormBuilder) {
     this.tourForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(2)]],
-      category: ['hike', Validators.required],
+      transportType: ['walking', Validators.required],
       accessible: [false],
       description: [''],
-      image: [''],
       startPoint: this.fb.group({
         name: ['', Validators.required],
         latitude: [null, [Validators.required, Validators.min(-90), Validators.max(90)]],
@@ -98,7 +97,6 @@ export class TourFormComponent {
       route: this.fb.group({
         distance: [null, [Validators.required, Validators.min(0)]],
         durationMin: [null, [Validators.required, Validators.min(0)]],
-        routeInfo: [''],
         geometry: [[]],
       }),
       pois: this.fb.array([]),
@@ -128,7 +126,7 @@ export class TourFormComponent {
     });
 
     this.tourForm.statusChanges.subscribe((s) => this.formStatus.set(s));
-    this.tourForm.get('category')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
+    this.tourForm.get('transportType')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
     this.tourForm.get('accessible')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
     this.tourForm.get('startPoint')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
     this.tourForm.get('endPoint')?.valueChanges.subscribe(() => this.scheduleRouteCalculation());
@@ -175,8 +173,10 @@ export class TourFormComponent {
       const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&accept-language=de`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Geocoding fehlgeschlagen: ${res.status}`);
-      this.setSuggestions(field, await res.json());
-    } catch {
+      const results = await res.json();
+      this.setSuggestions(field, Array.isArray(results) ? results : []);
+    } catch (e) {
+      console.error('Nominatim: Geocoding fehlgeschlagen', e);
       this.setSuggestions(field, []);
     }
   }
@@ -288,11 +288,10 @@ export class TourFormComponent {
           id: crypto.randomUUID(),
           username: this.auth.activeSession().username,
           title: v.title,
-          category: v.category,
+          transportType: v.transportType,
           accessible: !!v.accessible,
           favorite: false,
           description: v.description,
-          image: v.image || 'tba',
           startPoint: v.startPoint,
           endPoint: v.endPoint,
           poi: v.pois ?? [],
@@ -349,18 +348,17 @@ export class TourFormComponent {
     const routePoints: RoutePoint[] = [start, ...poiPoints, end];
 
     this.routeStatus.set('Route wird berechnet...');
-    const category = this.tourForm.get('category')?.value ?? 'hike';
+    const transportType = this.tourForm.get('transportType')?.value ?? 'walking';
     const accessible = !!this.tourForm.get('accessible')?.value;
-    const route = await fetchOsrmRoute(routePoints, category, accessible);
+    const route = await fetchOsrmRoute(routePoints, transportType, accessible);
     const distanceKm = route
       ? Math.round(route.distanceM / 10) / 100
       : this.haversinePathKm(routePoints);
-    const durationMin = calcDurationMin(distanceKm, category, accessible ? -1 : 0);
+    const durationMin = calcDurationMin(distanceKm, transportType, accessible ? -1 : 0);
 
     this.tourForm.get('route')?.patchValue({
       distance: distanceKm,
       durationMin,
-      routeInfo: route ? `${route.profile}${accessible ? ' barrierefrei' : ''}` : 'Luftlinie-Schaetzung',
       geometry: route?.latLngs ?? routePoints.map((point) => [point.latitude, point.longitude]),
     }, { emitEvent: false });
     this.tourForm.get('route.distance')?.markAsDirty();
@@ -368,13 +366,13 @@ export class TourFormComponent {
 
     this.routeStatus.set(
       route
-        ? `Route automatisch fuer ${this.transportLabel(category, accessible)} berechnet${poiPoints.length ? `, mit ${poiPoints.length} Zwischenstopp${poiPoints.length > 1 ? 's' : ''}` : ''}.`
+        ? `Route automatisch fuer ${this.transportLabel(transportType, accessible)} berechnet${poiPoints.length ? `, mit ${poiPoints.length} Zwischenstopp${poiPoints.length > 1 ? 's' : ''}` : ''}.`
         : 'Route per Luftlinie geschaetzt, Routing-API nicht erreichbar.',
     );
   }
 
   private transportLabel(value: string, accessible: boolean): string {
-    const label = value === 'bike' ? 'Rad' : value === 'run' ? 'Laufen' : 'Wandern';
+    const label = value === 'cycling' ? 'Rad' : value === 'running' ? 'Laufen' : 'Wandern';
     return accessible ? `${label} barrierefrei` : label;
   }
 
