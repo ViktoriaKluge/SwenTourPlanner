@@ -21,7 +21,10 @@ public class AuthService {
   }
 
   public UserEntity register(String username, String password) {
-    if (users.existsByUsername(username)) throw new BadRequestException("Username bereits vergeben");
+    if (users.existsByUsername(username)) {
+      log.warn("Registration failed, username {} already exists", username);
+      throw new BadRequestException("Username bereits vergeben");
+    }
     UserEntity user = new UserEntity();
     user.setUsername(username);
     user.setPasswordHash(encoder.encode(password));
@@ -32,6 +35,7 @@ public class AuthService {
   public UserEntity login(String username, String password) {
     UserEntity user = find(username);
     if (!encoder.matches(password, user.getPasswordHash())) {
+      log.warn("Failed login attempt for user {} (wrong password)", username);
       throw new InvalidCredentialsException("Ungueltige Anmeldedaten");
     }
     log.info("User {} logged in", username);
@@ -39,6 +43,9 @@ public class AuthService {
   }
 
   public UserEntity find(String username) {
-    return users.findByUsername(username).orElseThrow(() -> new NotFoundException("Benutzer nicht gefunden"));
+    return users.findByUsername(username).orElseThrow(() -> {
+      log.warn("User {} not found", username);
+      return new NotFoundException("Benutzer nicht gefunden");
+    });
   }
 }

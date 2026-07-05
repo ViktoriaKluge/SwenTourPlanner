@@ -91,22 +91,31 @@ public class TourService {
 
   @Transactional
   public TourLogDto updateLog(String username, String tourId, String logId, TourLogDto dto) {
-    TourLogEntity log = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
-        .orElseThrow(() -> new NotFoundException("Log-Eintrag nicht gefunden"));
-    mapper.applyLog(dto, log, log.getTour());
-    log.setId(logId);
-    return mapper.logToDto(logs.save(log));
+    TourLogEntity entry = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
+        .orElseThrow(() -> {
+          log.warn("Log {} not found for tour {} and user {}", logId, tourId, username);
+          return new NotFoundException("Log-Eintrag nicht gefunden");
+        });
+    mapper.applyLog(dto, entry, entry.getTour());
+    entry.setId(logId);
+    return mapper.logToDto(logs.save(entry));
   }
 
   @Transactional
   public void deleteLog(String username, String tourId, String logId) {
-    TourLogEntity log = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
-        .orElseThrow(() -> new NotFoundException("Log-Eintrag nicht gefunden"));
-    logs.delete(log);
+    TourLogEntity entry = logs.findByIdAndTourIdAndTourUserUsername(logId, tourId, username)
+        .orElseThrow(() -> {
+          log.warn("Log {} not found for tour {} and user {}", logId, tourId, username);
+          return new NotFoundException("Log-Eintrag nicht gefunden");
+        });
+    logs.delete(entry);
   }
 
   private TourEntity findTour(String username, String id) {
-    return tours.findByIdAndUserUsername(id, username).orElseThrow(() -> new NotFoundException("Tour nicht gefunden"));
+    return tours.findByIdAndUserUsername(id, username).orElseThrow(() -> {
+      log.warn("Tour {} not found for user {}", id, username);
+      return new NotFoundException("Tour nicht gefunden");
+    });
   }
 
   private boolean routeRelevantFieldsChanged(TourEntity existing, TourDto incoming) {

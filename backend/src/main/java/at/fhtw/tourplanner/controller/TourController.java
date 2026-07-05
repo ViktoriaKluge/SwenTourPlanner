@@ -4,6 +4,8 @@ import at.fhtw.tourplanner.service.TourService;
 import at.fhtw.tourplanner.dto.TourDto;
 import at.fhtw.tourplanner.dto.TourLogDto;
 import at.fhtw.tourplanner.util.BadRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/tours")
 @CrossOrigin(origins = "http://localhost:4200")
 public class TourController {
+  private static final Logger log = LoggerFactory.getLogger(TourController.class);
   private final TourService tours;
 
   public TourController(TourService tours) {
@@ -93,6 +96,7 @@ public class TourController {
   @PostMapping("/import")
   public List<TourDto> importTours(Principal principal, @RequestBody List<TourDto> imported) {
     if (imported.size() > 100) {
+      log.warn("Import rejected for user {}: {} tours exceeds the limit", principal.getName(), imported.size());
       throw new BadRequestException("Maximal 100 Touren pro Import erlaubt.");
     }
     imported.forEach(dto -> {

@@ -42,14 +42,7 @@ public class OpenRouteServiceClient {
     try {
       String profile = profile(type, accessible);
       String url = properties.getOpenRouteService().getBaseUrl() + "/v2/directions/" + profile + "/geojson";
-      List<List<Double>> coordinates = new ArrayList<>();
-      coordinates.add(Arrays.asList(start.getLongitude(), start.getLatitude()));
-      if (waypoints != null) {
-        for (LocationEmbeddable wp : waypoints) {
-          coordinates.add(Arrays.asList(wp.getLongitude(), wp.getLatitude()));
-        }
-      }
-      coordinates.add(Arrays.asList(end.getLongitude(), end.getLatitude()));
+      List<List<Double>> coordinates = buildCoordinates(start, waypoints, end);
       Map<String, Object> body = new HashMap<>();
       body.put("coordinates", coordinates);
       HttpHeaders headers = new HttpHeaders();
@@ -73,12 +66,28 @@ public class OpenRouteServiceClient {
       }
       current.setGeometryJson(objectMapper.writeValueAsString(latLngs));
       if (type == TransportType.running) {
-        current.setDurationMin((int) Math.round(current.getDistance() / RUNNING_SPEED_KMH * 60)); // ors duration is not accurate for running, so we calculate it based on distance and average running speed
+        current.setDurationMin(runningDurationMin(current.getDistance()));
       }
     } catch (Exception ex) {
       log.warn("OpenRouteService request failed, keeping submitted route values: {}", ex.getMessage());
     }
     return current;
+  }
+
+  static List<List<Double>> buildCoordinates(LocationEmbeddable start, List<LocationEmbeddable> waypoints, LocationEmbeddable end) {
+    List<List<Double>> coordinates = new ArrayList<>();
+    coordinates.add(Arrays.asList(start.getLongitude(), start.getLatitude()));
+    if (waypoints != null) {
+      for (LocationEmbeddable wp : waypoints) {
+        coordinates.add(Arrays.asList(wp.getLongitude(), wp.getLatitude()));
+      }
+    }
+    coordinates.add(Arrays.asList(end.getLongitude(), end.getLatitude()));
+    return coordinates;
+  }
+
+  static int runningDurationMin(double distanceKm) {
+    return (int) Math.round(distanceKm / RUNNING_SPEED_KMH * 60);
   }
 
   private String profile(TransportType type, boolean accessible) {

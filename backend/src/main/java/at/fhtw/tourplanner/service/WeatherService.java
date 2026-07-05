@@ -239,7 +239,7 @@ public class WeatherService {
     return Math.round(value * 10000.0) / 10000.0;
   }
 
-  private String clothingAdvice(double feelsLike, double windKmh, String description) {
+  String clothingAdvice(double feelsLike, double windKmh, String description) {
     String lower = description == null ? "" : description.toLowerCase();
     boolean rain = lower.contains("regen") || lower.contains("rain") || lower.contains("schauer");
     StringBuilder advice = new StringBuilder();

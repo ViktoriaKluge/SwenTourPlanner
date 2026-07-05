@@ -72,26 +72,28 @@ class TourStatsAndSearchTest {
 
   @Test void searchMatchesPopularity() {
     TourEntity tour = tour("Tour", "");
-    tour.getLogs().add(log(2, 5, 70, "a"));
-    assertTrue(search.matches(tour, "1"));
+    tour.getLogs().add(log(1, 5, 60, "a", 4));
+    tour.getLogs().add(log(1, 5, 60, "b", 4));
+    tour.getLogs().add(log(1, 5, 60, "c", 4));
+    assertTrue(search.matches(tour, "3"));
   }
 
   @Test void searchMatchesComputedFriendlyValue() {
     TourEntity tour = tour("Tour", "");
     tour.getLogs().add(log(1, 4, 70, "a"));
-    assertTrue(search.matches(tour, "child-friendly"));
+    assertTrue(search.matches(tour, "kinderfreundlich"));
   }
 
   @Test void searchMatchesComputedModerateValue() {
     TourEntity tour = tour("Tour", "");
     tour.getLogs().add(log(3, 12, 220, "a"));
-    assertTrue(search.matches(tour, "moderate"));
+    assertTrue(search.matches(tour, "moderat"));
   }
 
   @Test void searchMatchesComputedDemandingValue() {
     TourEntity tour = tour("Tour", "");
     tour.getLogs().add(log(5, 22, 500, "a"));
-    assertTrue(search.matches(tour, "demanding"));
+    assertTrue(search.matches(tour, "anspruchsvoll"));
   }
 
   @Test void searchIgnoresCase() {
