@@ -12,10 +12,10 @@ Checked against `semester-project.pdf`.
 | Design patterns | Met | Repository pattern, DTO/Mapper pattern, service layer, MVVM in frontend. |
 | Reusable UI component | Met | Reusable components include `TourCardComponent`, `TourMapComponent`, log/form components. |
 | PostgreSQL via O/R mapper | Met | Spring Data JPA/Hibernate repositories and PostgreSQL dependency. |
-| Images stored externally | Not met | No image field exists on the tour model anymore (removed entirely); the checklist lists an image as a required tour attribute — decide whether to re-add it or justify the omission in the protocol. |
+| Images stored externally | Not met | No image stored at all, because map is calculated via api |
 | Logging framework | Met | Spring Boot SLF4J/Logback logging in backend services and `application.yml`. |
 | JUnit unit tests | Met | 63 JUnit tests across 9 test classes (stats/search, auth, cross-account isolation, import safety, routing logic, mapping, JWT, weather); see `UnitTests.md`. |
-| Configuration separate from code | Met | `application.yml` uses environment variables for DB, API keys, and image directory. |
+| Configuration separate from code | Met | `application.yml` uses environment variables for DB and API keys. |
 | Self-register and login | Met | `/api/auth/register`, `/api/auth/login` issue a JWT; Angular auth service/login view. |
 | Tour CRUD | Met | `/api/tours` endpoints and Angular tour form/list/detail views. |
 | Tour fields | Met | Model/DTO include title, description, start/end point, transport type, distance, duration, and route geometry for the map. |
@@ -30,26 +30,6 @@ Checked against `semester-project.pdf`.
 | Search includes computed values | Met | Covered by service logic and JUnit tests. |
 | Import/export | Met | `/api/tours/import` and `/api/tours/export`. |
 | Unique feature | Met | Weather summary integration through `/api/weather/**`. |
-| Wireframes/UML/protocol PDF | Missing | Required by the hand-in PDF and tied to a must-have (design pattern has to be mentioned in the protocol); doesn't exist yet. |
-| Time tracking | Missing | Required by the hand-in PDF; no time log exists yet. |
+| Wireframes/UML/protocol PDF | Partially met | `PROTOKOLL.md` covers architecture, design patterns, technical decisions, wireframes (screenshots), a use-case diagram, and a sequence diagram (both Mermaid). |
+| Time tracking | Missing |  |
 
----
-
-### Architektur / Dokumentation (Begründung)
-- Doppeltes Routing (OSRM im Frontend + ORS im Backend) erklären/begründen – z.B. als Fallback-Design dokumentieren
-- Warum `.env` manuell in `TourPlannerApplication` geladen wird (kein dotenv-Library-Support für Spring Boot 2.7)
-- Frontend ruft Nominatim und OSRM direkt aus dem Browser auf – bewusste Entscheidung 
-- Welche Design-Patterns / Konzepte wurden verwendet?
-- Haben wir ein Logging Framework und wie funktioniert es? Was loggt es?
-- Was genau macht unser unique feature? 
-- Wie genau areiten frontend und backend zusammen?
-- JWT-Security-Konzept begründen: warum JWT statt Session/Cookie, warum die Ownership serverseitig aus dem Token abgeleitet wird statt vom Client übergeben, bewusst kein Refresh-Token/Blacklisting
-- Layer-spezifische Exceptions (`BadRequestException`/`InvalidCredentialsException`/`NotFoundException`) als eigenes Design-Pattern-Element erwähnen
-- Warum Popularity/Child-Friendliness nicht in der DB gespeichert, sondern bei jedem Request neu berechnet werden
-- Unit-Test-Strategie begründen: welche Bereiche zuerst getestet wurden (Security/Isolation vor Kernlogik) und was bewusst ausgeklammert blieb (Exception-Handler-Tests brauchen Spring-Context statt reiner Unit-Tests; ein alter Cascade-Bug bräuchte einen JPA-Integrationstest)
-- Lauf-Geschwindigkeits-Korrektur: ORS hat kein eigenes "Laufen"-Profil, die Dauer wird nachträglich mit 8 km/h neu berechnet
-- Wheelchair-Routing: die Vorschau (OSRM, kein Rollstuhl-Profil) kann von der gespeicherten Route (ORS, echtes Profil) abweichen
-- Bild-Attribut: Entscheidung dokumentieren, warum kein Bild-Upload existiert (oder Feature nachziehen, falls Zeit bleibt)
-
-### Maybe add
-- **FAQ.** mit userguide und zB Berechnungen

@@ -15,7 +15,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQL10Dialect
 
 app:
-  upload-dir: ${TOUR_IMAGE_DIR:./data/images}
   open-route-service:
     api-key: ${ORS_API_KEY}
     base-url: ${ORS_BASE_URL:https://api.openrouteservice.org}

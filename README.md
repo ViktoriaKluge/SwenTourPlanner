@@ -6,10 +6,12 @@ Two-tier Tour Planner implementation for the semester project:
 - Spring Boot backend with controller, service/business, and repository/data-access layers
 - PostgreSQL persistence via Spring Data JPA/Hibernate
 - REST/JSON communication between frontend and backend
+- JWT-based authentication with per-user data isolation
 - OpenRouteService integration for route distance/time enrichment
+- OpenWeather integration for current/tour weather and clothing advice
 - Leaflet map display in the frontend
 - Import/export of tour data as JSON
-- Unit tests for full-text search and computed tour attributes
+- 63 JUnit unit tests covering search, computed attributes, auth, routing, and weather
 
 ## Prerequisites
 
@@ -20,7 +22,7 @@ Two-tier Tour Planner implementation for the semester project:
 
 ## Configuration
 
-Backend configuration is kept outside source code through environment variables. Defaults are provided for local development for DB and image directory.
+Backend configuration is kept outside source code through environment variables. Defaults are provided for local development for the DB.
 
 **The API keys must be provided before starting the backend.** Create a file `backend/.env` with the following content:
 
@@ -35,7 +37,6 @@ The backend loads this file automatically on startup. Alternatively, set the var
 $env:DB_URL="jdbc:postgresql://localhost:5432/tourplanner"
 $env:DB_USER="tourplanner"
 $env:DB_PASSWORD="tourplanner"
-$env:TOUR_IMAGE_DIR="./data/images"
 $env:ORS_API_KEY="<your-openrouteservice-key>"
 $env:OPENWEATHER_API_KEY="<your-openweather-key>"
 ```
@@ -87,6 +88,7 @@ The backend follows a layer-based architecture:
 - Data access layer: `backend/src/main/java/at/fhtw/tourplanner/repo`
 - Domain model: `backend/src/main/java/at/fhtw/tourplanner/model`
 - DTO boundary: `backend/src/main/java/at/fhtw/tourplanner/dto`
+- JWT authentication: `backend/src/main/java/at/fhtw/tourplanner/security`
 
 The Angular frontend follows an MVVM-oriented feature layout:
 
@@ -103,5 +105,6 @@ Design patterns used:
 
 Additional project documentation:
 
+- `PROTOKOLL.md`: architecture, design decisions, wireframes, and diagrams for the hand-in
 - `API.md`: REST endpoints and frontend/backend links
 - `UnitTests.md`: JUnit unit test catalogue and rationale

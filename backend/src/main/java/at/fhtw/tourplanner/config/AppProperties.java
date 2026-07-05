@@ -6,12 +6,9 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
-  private String uploadDir;
   private final OpenRouteService openRouteService = new OpenRouteService();
   private final OpenWeather openWeather = new OpenWeather();
 
-  public String getUploadDir() { return uploadDir; }
-  public void setUploadDir(String uploadDir) { this.uploadDir = uploadDir; }
   public OpenRouteService getOpenRouteService() { return openRouteService; }
   public OpenWeather getOpenWeather() { return openWeather; }
 

@@ -32,6 +32,7 @@
       @if (moreOpen()) {
         <div class="more-dropdown" role="menu">
           <button class="more-action" type="button" role="menuitem" (click)="goTo('about')">About</button>
+          <button class="more-action" type="button" role="menuitem" (click)="goTo('faq')">FAQ</button>
 
           @if (this.session().loggedIn) {
             <button class="more-action" type="button" role="menuitem" (click)="exportAll()">Export</button>
